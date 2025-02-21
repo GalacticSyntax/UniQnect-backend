@@ -15,6 +15,7 @@ import { CourseRoutes } from "../modules/course/course.route";
 import { AttendanceRoutes } from "../modules/attendance/attendance.route";
 import { AdminRoutes } from "../modules/admin/admin.route";
 import { CourseRegisteredRoutes } from "../modules/course.registered/course.registered.route";
+import { AuthRoutes } from "../modules/auth/auth.route";
 
 const router = express.Router();
 
@@ -82,6 +83,10 @@ const moduleRoutes: Array<IRouteSchema> = [
   {
     path: "/admin",
     route: AdminRoutes,
+  },
+  {
+    path: "/auth",
+    route: AuthRoutes,
   },
 ];
 

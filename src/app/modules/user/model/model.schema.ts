@@ -22,7 +22,7 @@ const userSchema = new Schema<IUser, IUserModel>(
       required: true,
       minlength: 6,
     },
-    isVarified: {
+    isVerified: {
       type: Boolean,
       default: false,
     },

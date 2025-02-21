@@ -49,3 +49,8 @@ export interface IMediaFileDimension {
   width: number;
   height: number;
 }
+
+export interface IVerifyEmailTokenData {
+  email: string;
+  userId: string;
+}

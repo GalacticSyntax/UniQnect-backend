@@ -1,18 +1,28 @@
 import { Request, Response } from "express";
 import { UserModel } from "./model/model";
-
+import { v4 as uuid } from "uuid";
 
 export const createUser = async (req: Request, res: Response) => {
+  const password = uuid();
   try {
-    const user = await UserModel.create(req.body);
-    res.status(201).json({ success: true, data: user });
+    const user = (
+      await UserModel.create({
+        role: "student",
+        ...req.body,
+        password,
+      })
+    ).toObject();
+
+    res.status(201).json({ success: true, data: { ...user, password } });
   } catch (error) {
     const errMessage =
       error instanceof Error ? error.message : "An unknown error occurred";
-    res.status(400).json({ success: false, message: errMessage });
+    res.status(400).json({
+      success: false,
+      message: errMessage,
+    });
   }
 };
-
 
 export const updateUser = async (req: Request, res: Response) => {
   try {
