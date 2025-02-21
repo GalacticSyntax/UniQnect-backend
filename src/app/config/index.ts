@@ -10,7 +10,7 @@ export default {
   PORT: process.env.PORT as string,
   PROJECT_ENVIRONMENT: (
     process.env.PROJECT_ENVIRONMENT as string
-  ).toLowerCase(),
+  ),
   DB_CONNECTION_STRING:
     (process.env.PROJECT_ENVIRONMENT as string) === "development"
       ? process.env.DB_CONNECTION_STRING
