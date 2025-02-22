@@ -1,28 +1,51 @@
 import { Request, Response } from "express";
 import { UserModel } from "./model/model";
 import { v4 as uuid } from "uuid";
+import catchAsync from "../../utils/catch.async";
+import { sendResponse } from "../../utils/send.response";
+import httpStatus from "http-status";
 
-export const createUser = async (req: Request, res: Response) => {
+// export interface ITeacher {
+//   userId: Types.ObjectId;
+//   teacherId: string;
+//   designation: "" | "";
+//   joinedAt: Date;
+//   departmentId: Types.ObjectId;
+// }
+
+// export interface IUser {
+//   fullName: string;
+//   email: string;
+//   password: string;
+//   isVerified?: boolean;
+//   image: string;
+//   role?: string;
+//   phone: string;
+//   gender: "male" | "female";
+//   presentAddress?: string;
+//   permanentAddress?: string;
+// }
+
+export const createUser = catchAsync(async (req: Request, res: Response) => {
+  
   const password = uuid();
-  try {
-    const user = (
-      await UserModel.create({
-        role: "student",
-        ...req.body,
-        password,
-      })
-    ).toObject();
+  const user = (
+    await UserModel.create({
+      role: "student",
+      ...req.body,
+      password,
+    })
+  ).toObject();
 
-    res.status(201).json({ success: true, data: { ...user, password } });
-  } catch (error) {
-    const errMessage =
-      error instanceof Error ? error.message : "An unknown error occurred";
-    res.status(400).json({
-      success: false,
-      message: errMessage,
-    });
-  }
-};
+
+
+  return sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: "User created successfully",
+    data: { ...user, password },
+  });
+});
 
 export const updateUser = async (req: Request, res: Response) => {
   try {
