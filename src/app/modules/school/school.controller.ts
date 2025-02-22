@@ -17,9 +17,19 @@ export const createSchool = async (req: Request, res: Response) => {
 export const updateSchool = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const school = await SchoolModel.findByIdAndUpdate(id, req.body, {
-      new: true,
-    });
+    const { name } = req.body;
+
+    if (!name) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Name is required for update" });
+    }
+
+    const school = await SchoolModel.findByIdAndUpdate(
+      id,
+      { name }, 
+      { new: true },
+    );
 
     if (!school) {
       return res

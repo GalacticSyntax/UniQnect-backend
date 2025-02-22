@@ -8,9 +8,9 @@ import {
 
 const router = express.Router();
 
-router.post("/create", createSchool);
-router.put("/schools/:id", updateSchool);
-router.get("/schools", getAllSchools);
-router.get("/schools/query", getSchoolsByQuery);
+router.post("/", createSchool);
+router.patch("/:id", updateSchool);
+router.get("/", getAllSchools);
+router.get("/query", getSchoolsByQuery);
 
 export const SchoolRoutes = router;
