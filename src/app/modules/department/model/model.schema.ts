@@ -15,7 +15,8 @@ const departmentSchema = new Schema<IDepartment, IDepartmentModel>(
       unique: true,
     },
     schoolId: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: SchoolConstant.SCHOOL_COLLECTION_NAME,
       required: true,
     },
   },

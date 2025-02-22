@@ -19,7 +19,11 @@ export const createDepartment = catchAsync(
       );
     }
 
-    const department = await DepartmentModel.create({ code, name, schoolId });
+    const department = await DepartmentModel.create({
+      code,
+      name,
+      schoolId: existingSchool?._id?.toString(),
+    });
 
     return sendResponse(res, {
       statusCode: httpStatus.OK,
@@ -53,14 +57,22 @@ export const updateDepartment = async (req: Request, res: Response) => {
 
 export const getAllDepartments = catchAsync(
   async (_req: Request, res: Response) => {
-    const departments = await DepartmentModel.find();
-    res.json({ success: true, data: departments });
+    const departments = await DepartmentModel.find().populate({
+      path: "schoolId",
+      select: "name",
+    }).lean();
+
+    const departmentList = departments.map((department) => ({
+      ...department,
+      school: (department.schoolId as unknown as { name: string }).name,
+      schoolId: undefined,
+    }));
 
     return sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
       message: "Departments found successfully",
-      data: departments,
+      data: departmentList,
     });
   },
 );
