@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { SchoolModel } from "./model/model";
+import catchAsync from "../../utils/catch.async";
 
 
-export const createSchool = async (req: Request, res: Response) => {
+export const createSchool = catchAsync(async (req: Request, res: Response) => {
   try {
     const school = await SchoolModel.create(req.body);
     res.status(201).json({ success: true, data: school });
@@ -11,10 +12,10 @@ export const createSchool = async (req: Request, res: Response) => {
       error instanceof Error ? error.message : "An unknown error occurred";
     res.status(400).json({ success: false, message: errMessage });
   }
-};
+});
 
 
-export const updateSchool = async (req: Request, res: Response) => {
+export const updateSchool = catchAsync(async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { name } = req.body;
@@ -27,7 +28,7 @@ export const updateSchool = async (req: Request, res: Response) => {
 
     const school = await SchoolModel.findByIdAndUpdate(
       id,
-      { name }, 
+      { name },
       { new: true },
     );
 
@@ -43,10 +44,10 @@ export const updateSchool = async (req: Request, res: Response) => {
       error instanceof Error ? error.message : "An unknown error occurred";
     res.status(400).json({ success: false, message: errMessage });
   }
-};
+});
 
 
-export const getAllSchools = async (_req: Request, res: Response) => {
+export const getAllSchools = catchAsync(async (_req: Request, res: Response) => {
   try {
     const schools = await SchoolModel.find();
     res.json({ success: true, data: schools });
@@ -55,10 +56,10 @@ export const getAllSchools = async (_req: Request, res: Response) => {
       error instanceof Error ? error.message : "An unknown error occurred";
     res.status(500).json({ success: false, message: errMessage });
   }
-};
+});
 
 
-export const getSchoolsByQuery = async (req: Request, res: Response) => {
+export const getSchoolsByQuery = catchAsync(async (req: Request, res: Response) => {
   try {
     const query = req.query;
     const schools = await SchoolModel.find(query);
@@ -68,6 +69,6 @@ export const getSchoolsByQuery = async (req: Request, res: Response) => {
       error instanceof Error ? error.message : "An unknown error occurred";
     res.status(500).json({ success: false, message: errMessage });
   }
-};
+});
 
 // export const SchoolController = {};

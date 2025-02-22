@@ -1,10 +1,24 @@
 import { Request, Response } from "express";
 import { DepartmentModel } from "./model/model";
+import { SchoolModel } from "../school/model/model";
 
 
 export const createDepartment = async (req: Request, res: Response) => {
   try {
-    const department = await DepartmentModel.create(req.body);
+    const { code, name, schoolId } = req.body;
+
+    const existingSchool = await SchoolModel.findById(schoolId);
+    if (!existingSchool) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "Invalid schoolId. School not found.",
+        });
+    }
+
+    const department = await DepartmentModel.create({ code, name, schoolId });
+
     res.status(201).json({ success: true, data: department });
   } catch (error) {
     const errMessage =
