@@ -25,7 +25,7 @@ export const createUser = catchAsync(async (req: Request, res: Response) => {
 
   req.body.departmentId = departmentData?._id?.toString();
 
-  if (!departmentData)
+  if (!departmentData && ["teacher", "student"].includes(role))
     throw new AppError(httpStatus.NOT_FOUND, "department not found");
 
   const password = uuid();
