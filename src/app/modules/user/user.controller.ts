@@ -4,6 +4,10 @@ import { v4 as uuid } from "uuid";
 import catchAsync from "../../utils/catch.async";
 import { sendResponse } from "../../utils/send.response";
 import httpStatus from "http-status";
+import AppError from "../../errors/AppError";
+import { DepartmentModel } from "../department/model/model";
+import { StudentModel } from "../student/model/model";
+import { TeacherModel } from "../teacher/model/model";
 
 // export interface ITeacher {
 //   userId: Types.ObjectId;
@@ -27,7 +31,23 @@ import httpStatus from "http-status";
 // }
 
 export const createUser = catchAsync(async (req: Request, res: Response) => {
-  
+  const { role, teacherId, studentId, departmentId, designation } = req.body;
+
+  if (
+    (role === "teacher" && (!teacherId || !departmentId || !designation)) ||
+    (role === "student" && (!studentId || !departmentId))
+  )
+    throw new AppError(httpStatus.BAD_REQUEST, "Request is not complete");
+
+  const departmentData = await DepartmentModel.findOne({
+    code: departmentId,
+  });
+
+  req.body.departmentId = departmentData?._id?.toString();
+
+  if (!departmentData)
+    throw new AppError(httpStatus.NOT_FOUND, "department not found");
+
   const password = uuid();
   const user = (
     await UserModel.create({
@@ -37,7 +57,27 @@ export const createUser = catchAsync(async (req: Request, res: Response) => {
     })
   ).toObject();
 
+  if (!user)
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "something went wrong",
+    );
 
+  if (role === "student") {
+    await StudentModel.create({
+      userId: user._id.toString(),
+      studentId,
+      departmentId: req.body.departmentId,
+    });
+  }
+  if (role === "teacher") {
+    await TeacherModel.create({
+      userId: user._id.toString(),
+      teacherId,
+      departmentId: req.body.departmentId,
+      designation,
+    });
+  }
 
   return sendResponse(res, {
     statusCode: httpStatus.CREATED,

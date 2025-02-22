@@ -10,10 +10,10 @@ import checkUserAuthStatus from "../../middlewares/check.user.auth.status";
 
 const router = express.Router();
 
-router.post("/users", createUser);
-router.put("/users/:id", updateUser);
-router.get("/users", getAllUsers);
+router.post("/", createUser);
+router.put("/:id", updateUser);
+router.get("/", getAllUsers);
 // router.get("/users", checkUserAuthStatus, verifyRole("student"), getAllUsers); /* Example of verifyRole middleware */
-router.get("/users/query", getUsersByQuery);
+router.get("/query", getUsersByQuery);
 
 export const UserRoutes = router;
