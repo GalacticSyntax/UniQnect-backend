@@ -1,8 +1,5 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
-import {
-  IErrorDetails,
-  IJWTPayload,
-} from "./auth.interface";
+import { IErrorDetails, IJWTPayload } from "./auth.interface";
 import { Request, Response } from "express";
 import config from "../../config";
 import AppError from "../../errors/AppError";

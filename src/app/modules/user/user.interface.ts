@@ -7,7 +7,7 @@ export interface IUser {
   password: string;
   isVerified?: boolean;
   image: string;
-  role?: Array<string>;
+  role?: string;
   phone: string;
   gender: "male" | "female";
   presentAddress?: string;
