@@ -3,6 +3,7 @@ import { SchoolModel } from "./model/model";
 import catchAsync from "../../utils/catch.async";
 import { sendResponse } from "../../utils/send.response";
 import httpStatus from "http-status";
+import AppError from "../../errors/AppError";
 
 export const createSchool = catchAsync(async (req: Request, res: Response) => {
   const school = await SchoolModel.create(req.body);
@@ -21,9 +22,7 @@ export const updateSchool = catchAsync(async (req: Request, res: Response) => {
   const { name } = req.body;
 
   if (!name) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Name is required for update" });
+    throw new AppError(httpStatus.BAD_REQUEST, "Name is required for update");    
   }
 
   const school = await SchoolModel.findByIdAndUpdate(
@@ -33,12 +32,15 @@ export const updateSchool = catchAsync(async (req: Request, res: Response) => {
   );
 
   if (!school) {
-    return res
-      .status(404)
-      .json({ success: false, message: "School not found" });
+    throw new AppError(httpStatus.NOT_FOUND, "School not found");    
   }
 
-  res.json({ success: true, data: school });
+  return sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: "School created successfully",
+    data: school,
+  });
 });
 
 export const getAllSchools = catchAsync(
