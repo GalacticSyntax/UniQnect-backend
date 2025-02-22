@@ -4,7 +4,7 @@ import { TDocumentType } from "../../interface/interface";
 export interface IDepartment {
   name: string;
   code: string;
-  schoolId: Types.ObjectId;
+  schoolId: string;
 }
 
 export interface IDepartmentModel extends Model<IDepartment> {

@@ -6,27 +6,29 @@ import httpStatus from "http-status";
 import { sendResponse } from "../../utils/send.response";
 import catchAsync from "../../utils/catch.async";
 
-export const createDepartment = catchAsync(async (req: Request, res: Response) => {
-  const { code, name, schoolId } = req.body;
+export const createDepartment = catchAsync(
+  async (req: Request, res: Response) => {
+    const { code, name, schoolId } = req.body;
 
-  const existingSchool = await SchoolModel.find(schoolId);
-  if (!existingSchool) {
-    throw new AppError(
-      httpStatus.NOT_FOUND,
-      "Invalid schoolId or School not found.",
-    );
-  }
+    const existingSchool = await SchoolModel.findOne({ schoolId });
 
-  const department = await DepartmentModel.create({ code, name, schoolId });
+    if (!existingSchool) {
+      throw new AppError(
+        httpStatus.NOT_FOUND,
+        "Invalid schoolId or School not found.",
+      );
+    }
 
-  res.status(201).json({ success: true, data: department });
-  return sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Department created successfully",
-    data: department,
-  });
-});
+    const department = await DepartmentModel.create({ code, name, schoolId });
+
+    return sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Department created successfully",
+      data: department,
+    });
+  },
+);
 
 export const updateDepartment = async (req: Request, res: Response) => {
   try {
