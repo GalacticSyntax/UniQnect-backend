@@ -47,7 +47,7 @@ export const getAllSchools = catchAsync(async (_req, res) => {
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "School created successfully",
+    message: "Schools found successfully",
     data: schools,
   });
 });
