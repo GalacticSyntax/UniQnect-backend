@@ -8,9 +8,9 @@ import {
 
 const router = express.Router();
 
-router.post("/departments", createDepartment);
-router.put("/departments/:id", updateDepartment);
-router.get("/departments", getAllDepartments);
-router.get("/departments/query", getDepartmentsByQuery);
+router.post("/", createDepartment);
+router.patch("/:id", updateDepartment);
+router.get("/", getAllDepartments);
+router.get("/query", getDepartmentsByQuery);
 
 export const DepartmentRoutes = router;

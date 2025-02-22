@@ -1,32 +1,32 @@
 import { Request, Response } from "express";
 import { DepartmentModel } from "./model/model";
 import { SchoolModel } from "../school/model/model";
+import AppError from "../../errors/AppError";
+import httpStatus from "http-status";
+import { sendResponse } from "../../utils/send.response";
+import catchAsync from "../../utils/catch.async";
 
+export const createDepartment = catchAsync(async (req: Request, res: Response) => {
+  const { code, name, schoolId } = req.body;
 
-export const createDepartment = async (req: Request, res: Response) => {
-  try {
-    const { code, name, schoolId } = req.body;
-
-    const existingSchool = await SchoolModel.findById(schoolId);
-    if (!existingSchool) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Invalid schoolId. School not found.",
-        });
-    }
-
-    const department = await DepartmentModel.create({ code, name, schoolId });
-
-    res.status(201).json({ success: true, data: department });
-  } catch (error) {
-    const errMessage =
-      error instanceof Error ? error.message : "An unknown error occurred";
-    res.status(400).json({ success: false, message: errMessage });
+  const existingSchool = await SchoolModel.findById(schoolId);
+  if (!existingSchool) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Invalid schoolId or School not found.",
+    );
   }
-};
 
+  const department = await DepartmentModel.create({ code, name, schoolId });
+
+  res.status(201).json({ success: true, data: department });
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Department created successfully",
+    data: department,
+  });
+});
 
 export const updateDepartment = async (req: Request, res: Response) => {
   try {
@@ -49,7 +49,6 @@ export const updateDepartment = async (req: Request, res: Response) => {
   }
 };
 
-
 export const getAllDepartments = async (_req: Request, res: Response) => {
   try {
     const departments = await DepartmentModel.find();
@@ -57,10 +56,9 @@ export const getAllDepartments = async (_req: Request, res: Response) => {
   } catch (error) {
     const errMessage =
       error instanceof Error ? error.message : "An unknown error occurred";
-    res.status(500).json({ success: false, message: errMessage }); 
+    res.status(500).json({ success: false, message: errMessage });
   }
 };
-
 
 export const getDepartmentsByQuery = async (req: Request, res: Response) => {
   try {
