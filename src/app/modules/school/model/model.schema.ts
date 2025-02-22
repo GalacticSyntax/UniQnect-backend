@@ -7,10 +7,12 @@ const schoolSchema = new Schema<ISchool, ISchoolModel>(
       type: String,
       required: true,
       trim: true,
+      unique: true,
     },
     schoolId: {
       type: String,
       required: true,
+      unique: true,
     },
   },
   {
