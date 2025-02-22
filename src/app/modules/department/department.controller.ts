@@ -51,16 +51,19 @@ export const updateDepartment = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllDepartments = async (_req: Request, res: Response) => {
-  try {
+export const getAllDepartments = catchAsync(
+  async (_req: Request, res: Response) => {
     const departments = await DepartmentModel.find();
     res.json({ success: true, data: departments });
-  } catch (error) {
-    const errMessage =
-      error instanceof Error ? error.message : "An unknown error occurred";
-    res.status(500).json({ success: false, message: errMessage });
-  }
-};
+
+    return sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Departments found successfully",
+      data: departments,
+    });
+  },
+);
 
 export const getDepartmentsByQuery = async (req: Request, res: Response) => {
   try {
