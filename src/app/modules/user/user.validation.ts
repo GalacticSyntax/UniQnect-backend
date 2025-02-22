@@ -23,6 +23,7 @@ const createUserValidationSchema = zod.object({
   permanentAddress: zod.string().trim().optional(),
   teacherId: zod.string().trim().optional(),
   studentId: zod.string().trim().optional(),
+  session: zod.string().trim().optional(),
   designation: zod.string().trim().optional(),
   departmentId: zod.string().trim().optional(),
   // .max(

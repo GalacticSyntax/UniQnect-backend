@@ -9,33 +9,13 @@ import { DepartmentModel } from "../department/model/model";
 import { StudentModel } from "../student/model/model";
 import { TeacherModel } from "../teacher/model/model";
 
-// export interface ITeacher {
-//   userId: Types.ObjectId;
-//   teacherId: string;
-//   designation: "" | "";
-//   joinedAt: Date;
-//   departmentId: Types.ObjectId;
-// }
-
-// export interface IUser {
-//   fullName: string;
-//   email: string;
-//   password: string;
-//   isVerified?: boolean;
-//   image: string;
-//   role?: string;
-//   phone: string;
-//   gender: "male" | "female";
-//   presentAddress?: string;
-//   permanentAddress?: string;
-// }
-
 export const createUser = catchAsync(async (req: Request, res: Response) => {
-  const { role, teacherId, studentId, departmentId, designation } = req.body;
+  const { role, teacherId, studentId, departmentId, designation, session } =
+    req.body;
 
   if (
     (role === "teacher" && (!teacherId || !departmentId || !designation)) ||
-    (role === "student" && (!studentId || !departmentId))
+    (role === "student" && (!studentId || !departmentId || !session))
   )
     throw new AppError(httpStatus.BAD_REQUEST, "Request is not complete");
 

@@ -8,6 +8,7 @@ const departmentSchema = new Schema<IDepartment, IDepartmentModel>(
       type: String,
       required: true,
       unique: true,
+      lowercase: true,
     },
     name: {
       type: String,
