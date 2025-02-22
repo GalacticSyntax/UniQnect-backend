@@ -44,7 +44,6 @@ export const updateSchool = catchAsync(async (req, res) => {
 
 export const getAllSchools = catchAsync(async (_req, res) => {
   const schools = await SchoolModel.find();
-  res.json({ success: true, data: schools });
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
