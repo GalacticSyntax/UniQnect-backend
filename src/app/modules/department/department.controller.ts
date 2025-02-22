@@ -9,7 +9,7 @@ import catchAsync from "../../utils/catch.async";
 export const createDepartment = catchAsync(async (req: Request, res: Response) => {
   const { code, name, schoolId } = req.body;
 
-  const existingSchool = await SchoolModel.findById(schoolId);
+  const existingSchool = await SchoolModel.find(schoolId);
   if (!existingSchool) {
     throw new AppError(
       httpStatus.NOT_FOUND,
