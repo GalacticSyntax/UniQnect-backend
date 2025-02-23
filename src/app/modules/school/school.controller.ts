@@ -43,7 +43,25 @@ export const updateSchool = catchAsync(async (req, res) => {
 });
 
 export const getAllSchools = catchAsync(async (_req, res) => {
-  const schools = await SchoolModel.find();
+  const schools = await SchoolModel.aggregate([
+    {
+      $lookup: {
+        from: "departments",
+        localField: "_id",
+        foreignField: "schoolId",
+        as: "departments",
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        name: 1,
+        schoolId: 1,
+        number_of_departments: { $size: "$departments" },
+      },
+    },
+  ]);
+
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
