@@ -55,27 +55,56 @@ export const updateDepartment = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllDepartments = catchAsync(
-  async (_req: Request, res: Response) => {
-    const departments = await DepartmentModel.find().populate({
-      path: "schoolId",
-      select: "name",
-    }).lean();
+export const getAllDepartments = catchAsync(async (req, res) => {
+  const departments = await DepartmentModel.aggregate([
+    {
+      $lookup: {
+        from: "schools", // Make sure the collection name matches in MongoDB
+        localField: "schoolId",
+        foreignField: "_id",
+        as: "school",
+      },
+    },
+    {
+      $unwind: {
+        path: "$school",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: "teachers", // Ensure collection name matches MongoDB
+        localField: "_id",
+        foreignField: "departmentId",
+        as: "teachers",
+      },
+    },
+    {
+      $lookup: {
+        from: "students", // Ensure collection name matches MongoDB
+        localField: "_id",
+        foreignField: "departmentId",
+        as: "students",
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        name: 1,
+        school: "$school.name",
+        number_of_teacher: { $size: "$teachers" },
+        number_of_students: { $size: "$students" },
+      },
+    },
+  ]);
 
-    const departmentList = departments.map((department) => ({
-      ...department,
-      school: (department.schoolId as unknown as { name: string }).name,
-      schoolId: undefined,
-    }));
-
-    return sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: "Departments found successfully",
-      data: departmentList,
-    });
-  },
-);
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Departments found successfully",
+    data: departments,
+  });
+});
 
 export const getDepartmentsByQuery = async (req: Request, res: Response) => {
   try {
