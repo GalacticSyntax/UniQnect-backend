@@ -120,7 +120,7 @@ export const updateUser = async (req: Request, res: Response) => {
 export const getAllUsers = catchAsync(async (req: Request, res: Response) => {
   const query = req.query;
   const userQuery = new QueryBuilder(UserModel.find(), query)
-    .search([])
+    .search(["email"])
     .filter()
     .sort()
     .paginate()
