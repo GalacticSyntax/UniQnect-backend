@@ -71,9 +71,12 @@ export const createUser = catchAsync(async (req: Request, res: Response) => {
 export const getAllAdmissionOfficers = catchAsync(
   async (req: Request, res: Response) => {
     const query = req.query;
-    const userQuery = new QueryBuilder(UserModel.find({
-      role: "admission-office"
-    }), query)
+    const userQuery = new QueryBuilder(
+      UserModel.find({
+        role: "admission-office",
+      }),
+      query,
+    )
       .search([])
       .filter()
       .sort()
@@ -114,16 +117,28 @@ export const updateUser = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllUsers = async (_req: Request, res: Response) => {
-  try {
-    const users = await UserModel.find();
-    res.json({ success: true, data: users });
-  } catch (error) {
-    const errMessage =
-      error instanceof Error ? error.message : "An unknown error occurred";
-    res.status(500).json({ success: false, message: errMessage });
-  }
-};
+export const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+  const query = req.query;
+  const userQuery = new QueryBuilder(UserModel.find(), query)
+    .search([])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const meta = await userQuery.countTotal();
+  const result = await userQuery.modelQuery;
+
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User found successfully",
+    data: {
+      meta,
+      result,
+    },
+  });
+});
 
 export const getUsersByQuery = async (req: Request, res: Response) => {
   try {
