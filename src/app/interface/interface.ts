@@ -54,3 +54,11 @@ export interface IVerifyEmailTokenData {
   email: string;
   userId: string;
 }
+
+export interface IEmail {
+  from?: string;
+  to: string;
+  subject: string;
+  text: string;
+  html: string;
+}

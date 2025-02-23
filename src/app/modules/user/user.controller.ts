@@ -9,8 +9,11 @@ import { DepartmentModel } from "../department/model/model";
 import { StudentModel } from "../student/model/model";
 import { TeacherModel } from "../teacher/model/model";
 import QueryBuilder from "../../builder/QueryBuilder";
+import { UserUtils } from "./user.utils";
 
 export const createUser = catchAsync(async (req: Request, res: Response) => {
+  console.log(req.body);
+
   const { role, teacherId, studentId, departmentId, designation, session } =
     req.body;
 
@@ -30,6 +33,7 @@ export const createUser = catchAsync(async (req: Request, res: Response) => {
     throw new AppError(httpStatus.NOT_FOUND, "department not found");
 
   const password = uuid();
+
   const user = (
     await UserModel.create({
       role: "student",
@@ -59,6 +63,11 @@ export const createUser = catchAsync(async (req: Request, res: Response) => {
       designation,
     });
   }
+
+  await UserUtils.sendEmailForPassword({
+    userId: user._id.toString(),
+    password,
+  });
 
   return sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -99,22 +108,17 @@ export const getAllAdmissionOfficers = catchAsync(
 );
 
 export const updateUser = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const user = await UserModel.findByIdAndUpdate(id, req.body, { new: true });
+  const { id } = req.params;
+  const user = await UserModel.findByIdAndUpdate(id, req.body, { new: true });
 
-    if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
-    }
+  if (!user) throw new AppError(httpStatus.NOT_FOUND, "user not found");
 
-    res.json({ success: true, data: user });
-  } catch (error) {
-    const errMessage =
-      error instanceof Error ? error.message : "An unknown error occurred";
-    res.status(400).json({ success: false, message: errMessage });
-  }
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User updated successfully",
+    data: user,
+  });
 };
 
 export const getAllUsers = catchAsync(async (req: Request, res: Response) => {
