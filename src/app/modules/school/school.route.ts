@@ -4,12 +4,14 @@ import {
   getAllSchools,
   getSchoolsByQuery,
   updateSchool,
+  getSchoolBySchooldId,
 } from "./school.controller";
 
 const router = express.Router();
 
 router.post("/", createSchool);
-router.patch("/:id", updateSchool);
+router.get("/:schoolId", getSchoolBySchooldId);
+router.patch("/:schoolId", updateSchool);
 router.get("/", getAllSchools);
 router.get("/query", getSchoolsByQuery);
 

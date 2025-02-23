@@ -6,7 +6,6 @@ import AppError from "../../errors/AppError";
 
 export const createSchool = catchAsync(async (req, res) => {
   const school = await SchoolModel.create(req.body);
-  res.status(201).json({ success: true, data: school });
 
   return sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -16,16 +15,31 @@ export const createSchool = catchAsync(async (req, res) => {
   });
 });
 
+export const getSchoolBySchooldId = catchAsync(async (req, res) => {
+  const { schoolId } = req.params;
+  const school = await SchoolModel.findOne({
+    schoolId,
+  });
+  console.log({ school });
+
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "School found successfully",
+    data: school,
+  });
+});
+
 export const updateSchool = catchAsync(async (req, res) => {
-  const { id } = req.params;
+  const { schoolId } = req.params;
   const { name } = req.body;
 
   if (!name) {
     throw new AppError(httpStatus.BAD_REQUEST, "Name is required for update");
   }
 
-  const school = await SchoolModel.findByIdAndUpdate(
-    id,
+  const school = await SchoolModel.findOneAndUpdate(
+    { schoolId },
     { name },
     { new: true },
   );
@@ -37,7 +51,7 @@ export const updateSchool = catchAsync(async (req, res) => {
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "School created successfully",
+    message: "School update successfully",
     data: school,
   });
 });
