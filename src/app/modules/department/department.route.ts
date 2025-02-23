@@ -4,6 +4,7 @@ import {
   departmentsVsStudents,
   departmentsVsTeachers,
   getAllDepartments,
+  getDepartmentsByCode,
   getDepartmentsByQuery,
   updateDepartment,
 } from "./department.controller";
@@ -11,8 +12,9 @@ import {
 const router = express.Router();
 
 router.post("/", createDepartment);
-router.patch("/:id", updateDepartment);
+router.patch("/:code", updateDepartment);
 router.get("/", getAllDepartments);
+router.get("/:code", getDepartmentsByCode);
 router.get("/query", getDepartmentsByQuery);
 router.get("/departmentsVsStudents", departmentsVsStudents);
 router.get("/departmentsVsTeachers", departmentsVsTeachers);

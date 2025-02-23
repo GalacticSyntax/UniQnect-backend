@@ -36,24 +36,31 @@ export const createDepartment = catchAsync(
 );
 
 export const updateDepartment = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const department = await DepartmentModel.findByIdAndUpdate(id, req.body, {
+  const { code } = req.params;
+  const department = await DepartmentModel.findOneAndUpdate(
+    {
+      code,
+    },
+    {
+      name: req.body.name,
+    },
+    {
       new: true,
-    });
+    },
+  );
 
-    if (!department) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Department not found" });
-    }
-
-    res.json({ success: true, data: department });
-  } catch (error) {
-    const errMessage =
-      error instanceof Error ? error.message : "An unknown error occurred";
-    res.status(400).json({ success: false, message: errMessage });
+  if (!department) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Department not found" });
   }
+
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Department updated successfully",
+    data: department,
+  });
 };
 
 export const getAllDepartments = catchAsync(async (req, res) => {
@@ -105,6 +112,34 @@ export const getAllDepartments = catchAsync(async (req, res) => {
     success: true,
     message: "Departments found successfully",
     data: departments,
+  });
+});
+
+export const getDepartmentsByCode = catchAsync(async (req, res) => {
+  const { code } = req.params;
+
+  const department = await DepartmentModel.findOne({
+    code,
+  })
+    .populate({
+      path: "schoolId",
+    })
+    .lean();
+
+  if (!department)
+    throw new AppError(httpStatus.NOT_FOUND, "department not found");
+
+  const result = {
+    ...department,
+    schoolId: (department.schoolId as unknown as { schoolId: string })
+      ?.schoolId,
+  };
+
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Departments found successfully",
+    data: result,
   });
 });
 
