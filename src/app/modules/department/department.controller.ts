@@ -5,6 +5,7 @@ import AppError from "../../errors/AppError";
 import httpStatus from "http-status";
 import { sendResponse } from "../../utils/send.response";
 import catchAsync from "../../utils/catch.async";
+import { StudentModel } from "../student/model/model";
 
 export const createDepartment = catchAsync(
   async (req: Request, res: Response) => {
@@ -91,8 +92,9 @@ export const getAllDepartments = catchAsync(async (req, res) => {
       $project: {
         _id: 1,
         name: 1,
+        code: 1,
         school: "$school.name",
-        number_of_teacher: { $size: "$teachers" },
+        number_of_teachers: { $size: "$teachers" },
         number_of_students: { $size: "$students" },
       },
     },
@@ -103,6 +105,36 @@ export const getAllDepartments = catchAsync(async (req, res) => {
     success: true,
     message: "Departments found successfully",
     data: departments,
+  });
+});
+
+export const departmentsVsStudents = catchAsync(async (req, res) => {
+  const result = await DepartmentModel.aggregate([
+    {
+      $lookup: {
+        from: "students",
+        localField: "_id",
+        foreignField: "departmentId",
+        as: "students",
+      },
+    },
+    {
+      $project: {
+        department: "$name",
+        code: "$code",
+        students: { $size: "$students" },
+      },
+    },
+    {
+      $sort: { students: -1 }, // Sort by student count in descending order
+    },
+  ]);
+
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "students vs departments found successfully",
+    data: result,
   });
 });
 
