@@ -16,7 +16,7 @@ export const getAllStudents = catchAsync(async (req, res) => {
       }),
     query,
   )
-    .search([])
+    .search(["studentId"])
     .filter()
     .sort()
     .paginate()
