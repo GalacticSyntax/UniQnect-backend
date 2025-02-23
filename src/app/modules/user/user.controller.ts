@@ -107,6 +107,18 @@ export const getAllAdmissionOfficers = catchAsync(
   },
 );
 
+export const getUserByEmail = catchAsync(async (req, res) => {
+  const { email } = req.params;
+  const result = await UserModel.findOne({ email });
+
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User found successfully",
+    data: result,
+  });
+});
+
 export const updateUser = async (req: Request, res: Response) => {
   const { id } = req.params;
   const user = await UserModel.findByIdAndUpdate(id, req.body, { new: true });

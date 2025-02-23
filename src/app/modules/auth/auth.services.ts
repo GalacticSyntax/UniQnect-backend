@@ -108,7 +108,7 @@ const loginUser = async ({ payload }: { payload: ILoginUser }) => {
 //   return updatedUser;
 // };
 
-const forgetPassword = async ({
+const changePassword = async ({
   email,
   password,
 }: {
@@ -130,13 +130,24 @@ const forgetPassword = async ({
     Number(config?.BCRYPT_SALT_ROUND),
   );
 
-  return await UserModel.findByIdAndUpdate(
+  let result = await UserModel.findByIdAndUpdate(
     userData?._id?.toString(),
     {
       password: hashedPassword,
     },
     { new: true },
-  );
+  ).lean();
+
+  if (result && !result.isVerified)
+    result = await UserModel.findByIdAndUpdate(
+      userData?._id?.toString(),
+      {
+        isVerified: true,
+      },
+      { new: true },
+    ).lean();
+
+  return result;
 };
 
 // const resetPassword = async ({
@@ -166,6 +177,6 @@ export const AuthServices = {
   loginUser,
   // emailVerifyRequest,
   // verifyEmail,
-  forgetPassword,
+  changePassword,
   // resetPassword,
 };

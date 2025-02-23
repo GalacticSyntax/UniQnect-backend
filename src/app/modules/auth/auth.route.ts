@@ -21,7 +21,7 @@ router.post(
   "/changePassword",
   validateRequest(AuthValidation.resetPasswordValidationSchema),
   checkUserAuthStatus,
-  AuthController.forgotPassword,
+  AuthController.changePassword,
 );
 
 router.get(

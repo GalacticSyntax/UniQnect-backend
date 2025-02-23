@@ -87,10 +87,10 @@ const logoutUser = catchAsync(async (req, res) => {
 //   });
 // });
 
-const forgotPassword = catchAsync(async (req, res) => {
+const changePassword = catchAsync(async (req, res) => {
   const { email, password } = req.body;
 
-  const result = await AuthServices.forgetPassword({ email, password });
+  const result = await AuthServices.changePassword({ email, password });
 
   return sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -125,6 +125,6 @@ export const AuthController = {
   logoutUser,
   // emailVerifyRequest,
   // verifyEmail,
-  forgotPassword,
+  changePassword,
   // resetPassword,
 };
