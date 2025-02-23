@@ -45,16 +45,21 @@ export const getAllTeachers = catchAsync(
     const meta = await userQuery.countTotal();
     const teachers = await userQuery.modelQuery.lean();
 
+    console.log(teachers);
+
     const result = teachers.map((teacher) => ({
       ...teacher,
       fullName: (teacher as unknown as { userId: { fullName: string } }).userId
-        .fullName,
-      email: (teacher as unknown as { userId: { email: string } }).userId.email,
-      phone: (teacher as unknown as { userId: { phone: string } }).userId.phone,
+        ?.fullName,
+      email: (teacher as unknown as { userId: { email: string } }).userId
+        ?.email,
+      phone: (teacher as unknown as { userId: { phone: string } }).userId
+        ?.phone,
       gender: (teacher as unknown as { userId: { gender: string } }).userId
-        .gender,
-      image: (teacher as unknown as { userId: { image: string } }).userId.image,
-      userId: (teacher as unknown as { userId: { _id: string } }).userId._id,
+        ?.gender,
+      image: (teacher as unknown as { userId: { image: string } }).userId
+        ?.image,
+      userId: (teacher as unknown as { userId: { _id: string } }).userId?._id,
     }));
 
     return sendResponse(res, {
