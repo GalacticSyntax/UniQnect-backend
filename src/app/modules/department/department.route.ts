@@ -14,9 +14,9 @@ const router = express.Router();
 router.post("/", createDepartment);
 router.patch("/:code", updateDepartment);
 router.get("/", getAllDepartments);
-router.get("/:code", getDepartmentsByCode);
-router.get("/query", getDepartmentsByQuery);
 router.get("/departmentsVsStudents", departmentsVsStudents);
 router.get("/departmentsVsTeachers", departmentsVsTeachers);
+router.get("/:code", getDepartmentsByCode);
+router.get("/query", getDepartmentsByQuery);
 
 export const DepartmentRoutes = router;
