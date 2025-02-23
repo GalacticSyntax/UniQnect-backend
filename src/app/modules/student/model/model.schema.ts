@@ -2,6 +2,7 @@ import { Schema } from "mongoose";
 import { IStudent, IStudentModel } from "../student.interface";
 import { StudentConstant } from "../student.constant";
 import { UserConstant } from "../../user/user.constant";
+import { DepartmentConstant } from "../../department/department.constant";
 
 const studentSchema = new Schema<IStudent, IStudentModel>(
   {
@@ -18,7 +19,7 @@ const studentSchema = new Schema<IStudent, IStudentModel>(
     },
     departmentId: {
       type: Schema.Types.ObjectId,
-      ref: StudentConstant.STUDENT_COLLECTION_NAME,
+      ref: DepartmentConstant.DEPARTMENT_COLLECTION_NAME,
       required: true,
     },
     admittedAt: {
@@ -27,7 +28,6 @@ const studentSchema = new Schema<IStudent, IStudentModel>(
     },
     session: {
       type: String,
-      enum: [""],
     },
   },
   {
