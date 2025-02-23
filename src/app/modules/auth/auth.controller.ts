@@ -8,6 +8,7 @@ import { IRequestWithActiveDetails } from "../../interface/interface";
 import { AuthServices } from "./auth.services";
 import { AuthUtils } from "./auth.utils";
 import { isEmail, millisecondsConvert } from "../../utils/utils";
+import { UserModel } from "../user/model/model";
 
 const loginUser = catchAsync(async (req, res) => {
   const { userId } = req as unknown as IRequestWithActiveDetails;
@@ -17,7 +18,7 @@ const loginUser = catchAsync(async (req, res) => {
 
   const body = req.body;
 
-  const { accessToken } = await AuthServices.loginUser({
+  const { accessToken, user } = await AuthServices.loginUser({
     payload: body,
   });
 
@@ -42,6 +43,7 @@ const loginUser = catchAsync(async (req, res) => {
     message: "you logged in succesfully!",
     data: {
       accessToken,
+      user,
     },
   });
 });

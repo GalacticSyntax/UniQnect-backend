@@ -8,9 +8,9 @@ import { AuthUtils } from "./auth.utils";
 const loginUser = async ({ payload }: { payload: ILoginUser }) => {
   const { password, email } = payload;
 
-  const user = await UserModel.findOne({
+  let user = await UserModel.findOne({
     email,
-  }).select({ password: 1 });
+  }).lean();
 
   if (!user)
     throw new AppError(httpStatus.NOT_FOUND, "This user is not found !");
@@ -31,9 +31,16 @@ const loginUser = async ({ payload }: { payload: ILoginUser }) => {
     expiresIn: config?.JWT_ACCESS_EXPIRES_IN as string,
   });
 
+  if (user.password)
+    user = {
+      ...user,
+      password: undefined as unknown as string,
+    };
+
   return {
     accessToken,
     userId,
+    user,
   };
 };
 
