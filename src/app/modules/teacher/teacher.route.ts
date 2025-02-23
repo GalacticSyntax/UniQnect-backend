@@ -2,7 +2,6 @@ import express from "express";
 
 
 import {
-  createTeacher,
   updateTeacher,
   getAllTeachers,
   getTeachersByQuery,
@@ -15,7 +14,7 @@ const router = express.Router();
 
 router.get("/", getAllTeachers); 
 router.get("/query", getTeachersByQuery); 
-router.post("/create", createTeacher); 
+// router.post("/create", createTeacher); 
 router.put("/:id", updateTeacher); 
 
 export const TeacherRoutes = router;

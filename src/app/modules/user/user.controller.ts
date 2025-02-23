@@ -77,7 +77,7 @@ export const getAllAdmissionOfficers = catchAsync(
       }),
       query,
     )
-      .search([])
+      .search(["email"])
       .filter()
       .sort()
       .paginate()

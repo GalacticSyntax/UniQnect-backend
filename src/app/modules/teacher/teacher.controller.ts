@@ -6,17 +6,6 @@ import { sendResponse } from "../../utils/send.response";
 import httpStatus from "http-status";
 import { UserModel } from "../user/model/model";
 
-export const createTeacher = async (req: Request, res: Response) => {
-  try {
-    const teacher = await TeacherModel.create(req.body);
-    res.status(201).json({ success: true, data: teacher });
-  } catch (error) {
-    const errMessage =
-      error instanceof Error ? error.message : "An unknown error occurred";
-    res.status(400).json({ success: false, message: errMessage });
-  }
-};
-
 export const updateTeacher = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -47,7 +36,7 @@ export const getAllTeachers = catchAsync(
       }),
       query,
     )
-      .search([])
+      .search(["teacherId"])
       .filter()
       .sort()
       .paginate()
