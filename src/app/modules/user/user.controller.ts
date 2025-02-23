@@ -8,6 +8,7 @@ import AppError from "../../errors/AppError";
 import { DepartmentModel } from "../department/model/model";
 import { StudentModel } from "../student/model/model";
 import { TeacherModel } from "../teacher/model/model";
+import QueryBuilder from "../../builder/QueryBuilder";
 
 export const createUser = catchAsync(async (req: Request, res: Response) => {
   const { role, teacherId, studentId, departmentId, designation, session } =
@@ -66,6 +67,33 @@ export const createUser = catchAsync(async (req: Request, res: Response) => {
     data: { ...user, password },
   });
 });
+
+export const getAllAdmissionOfficers = catchAsync(
+  async (req: Request, res: Response) => {
+    const query = req.query;
+    const userQuery = new QueryBuilder(UserModel.find({
+      role: "admission-office"
+    }), query)
+      .search([])
+      .filter()
+      .sort()
+      .paginate()
+      .fields();
+
+    const meta = await userQuery.countTotal();
+    const result = await userQuery.modelQuery;
+
+    return sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "User found successfully",
+      data: {
+        meta,
+        result,
+      },
+    });
+  },
+);
 
 export const updateUser = async (req: Request, res: Response) => {
   try {
