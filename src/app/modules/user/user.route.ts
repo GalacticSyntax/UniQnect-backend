@@ -16,7 +16,7 @@ router.get("/", getAllUsers);
 router.get("/:id", getUserById);
 router.get("/admission-officers", getAllAdmissionOfficers);
 router.post("/", createUser);
-router.put("/:id", updateUser);
+router.patch("/:id", updateUser);
 // router.get("/users", checkUserAuthStatus, verifyRole("student"), getAllUsers); /* Example of verifyRole middleware */
 router.get("/query", getUsersByQuery);
 
