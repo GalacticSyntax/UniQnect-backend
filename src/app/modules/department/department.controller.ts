@@ -138,6 +138,36 @@ export const departmentsVsStudents = catchAsync(async (req, res) => {
   });
 });
 
+export const departmentsVsTeachers = catchAsync(async (req, res) => {
+  const result = await DepartmentModel.aggregate([
+    {
+      $lookup: {
+        from: "teachers", // Assuming the collection name for teachers is "teachers"
+        localField: "_id",
+        foreignField: "departmentId",
+        as: "teachers",
+      },
+    },
+    {
+      $project: {
+        department: "$name",
+        code: "$code",
+        teachers: { $size: "$teachers" }, // Count the number of teachers
+      },
+    },
+    {
+      $sort: { teachers: -1 }, // Sort by teacher count in descending order
+    },
+  ]);
+
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Teachers vs Departments found successfully",
+    data: result,
+  });
+});
+
 export const getDepartmentsByQuery = async (req: Request, res: Response) => {
   try {
     const query = req.query;
