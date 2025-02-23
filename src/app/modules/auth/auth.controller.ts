@@ -87,18 +87,18 @@ const logoutUser = catchAsync(async (req, res) => {
 //   });
 // });
 
-// const forgotPassword = catchAsync(async (req, res) => {
-//   const { email } = req.body;
+const forgotPassword = catchAsync(async (req, res) => {
+  const { email, password } = req.body;
 
-//   const result = await AuthServices.forgetPassword({ email });
+  const result = await AuthServices.forgetPassword({ email, password });
 
-//   return sendResponse(res, {
-//     statusCode: httpStatus.OK,
-//     success: true,
-//     message: "email sent successfully",
-//     data: result,
-//   });
-// });
+  return sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "email sent successfully",
+    data: result,
+  });
+});
 
 // const resetPassword = catchAsync(async (req, res) => {
 //   const { password } = req.body;
@@ -125,6 +125,6 @@ export const AuthController = {
   logoutUser,
   // emailVerifyRequest,
   // verifyEmail,
-  // forgotPassword,
+  forgotPassword,
   // resetPassword,
 };

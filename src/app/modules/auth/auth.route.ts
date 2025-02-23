@@ -17,6 +17,13 @@ router.post(
   AuthController.loginUser,
 );
 
+router.post(
+  "/changePassword",
+  validateRequest(AuthValidation.resetPasswordValidationSchema),
+  checkUserAuthStatus,
+  AuthController.forgotPassword,
+);
+
 router.get(
   "/logout",
   checkUserAuthStatus,

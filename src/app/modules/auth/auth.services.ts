@@ -4,6 +4,7 @@ import AppError from "../../errors/AppError";
 import config from "../../config";
 import { ILoginUser } from "./auth.interface";
 import { AuthUtils } from "./auth.utils";
+import bcrypt from "bcrypt";
 
 const loginUser = async ({ payload }: { payload: ILoginUser }) => {
   const { password, email } = payload;
@@ -107,46 +108,36 @@ const loginUser = async ({ payload }: { payload: ILoginUser }) => {
 //   return updatedUser;
 // };
 
-// const forgetPassword = async ({
-//   emailOrUserName,
-// }: {
-//   emailOrUserName: string;
-// }) => {
-//   const userData = await UserModel.findOne({
-//     ...(isEmail(emailOrUserName)
-//       ? {
-//           email: emailOrUserName,
-//         }
-//       : {
-//           userName: emailOrUserName,
-//         }),
-//   }).lean();
+const forgetPassword = async ({
+  email,
+  password,
+}: {
+  email: string;
+  password: string;
+}) => {
+  const userData = await UserModel.findOne({
+    email: email,
+  }).lean();
 
-//   if (!userData)
-//     throw new AppError(
-//       httpStatus.NOT_FOUND,
-//       "no account exist with that email address",
-//     );
+  if (!userData)
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "no account exist with that email address",
+    );
 
-//   await UserModel.findByIdAndUpdate(
-//     userData?._id?.toString(),
-//     {
-//       needToChangePassword: true,
-//     },
-//     { new: true },
-//   );
+  const hashedPassword = await bcrypt.hash(
+    password,
+    Number(config?.BCRYPT_SALT_ROUND),
+  );
 
-//   const emailData = {
-//     _id: userData._id?.toString(),
-//     email: userData.email,
-//     fullName: userData.fullName,
-//   };
-
-//   // await emailQueue.add(QueueJobList.SEND_RESET_PASSWORD_EMAIL, emailData, {
-//   //   removeOnComplete: true,
-//   //   removeOnFail: true,
-//   // });
-// };
+  return await UserModel.findByIdAndUpdate(
+    userData?._id?.toString(),
+    {
+      password: hashedPassword,
+    },
+    { new: true },
+  );
+};
 
 // const resetPassword = async ({
 //   userId,
@@ -175,6 +166,6 @@ export const AuthServices = {
   loginUser,
   // emailVerifyRequest,
   // verifyEmail,
-  // forgetPassword,
+  forgetPassword,
   // resetPassword,
 };
