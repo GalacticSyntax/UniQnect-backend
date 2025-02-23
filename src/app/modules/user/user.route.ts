@@ -5,7 +5,7 @@ import {
   getAllUsers,
   getUsersByQuery,
   updateUser,
-  getUserByEmail,
+  getUserById,
 } from "./user.controller";
 import verifyRole from "../../middlewares/verify.role";
 import checkUserAuthStatus from "../../middlewares/check.user.auth.status";
@@ -13,7 +13,7 @@ import checkUserAuthStatus from "../../middlewares/check.user.auth.status";
 const router = express.Router();
 
 router.get("/", getAllUsers);
-router.get("/:email", getUserByEmail);
+router.get("/:id", getUserById);
 router.get("/admission-officers", getAllAdmissionOfficers);
 router.post("/", createUser);
 router.put("/:id", updateUser);

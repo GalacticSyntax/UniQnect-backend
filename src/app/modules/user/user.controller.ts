@@ -107,9 +107,31 @@ export const getAllAdmissionOfficers = catchAsync(
   },
 );
 
-export const getUserByEmail = catchAsync(async (req, res) => {
-  const { email } = req.params;
-  const result = await UserModel.findOne({ email });
+export const getUserById = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  let result = await UserModel.findById(id);
+
+  if (result && result.role === "student") {
+    result = await StudentModel.findOne({
+      userId: result?._id.toString(),
+    })
+      .populate({
+        path: "userId",
+      })
+      .populate({
+        path: "departmentId",
+      });
+  } else if (result && result.role === "teacher") {
+    result = await TeacherModel.findOne({
+      userId: result?._id.toString(),
+    })
+      .populate({
+        path: "userId",
+      })
+      .populate({
+        path: "departmentId",
+      });
+  }
 
   return sendResponse(res, {
     statusCode: httpStatus.OK,
