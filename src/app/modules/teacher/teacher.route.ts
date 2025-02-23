@@ -13,8 +13,8 @@ const router = express.Router();
 
 // console.log("Hello");
 
-router.get("/teachers", getAllTeachers); 
-router.get("/teachers/query", getTeachersByQuery); 
+router.get("/", getAllTeachers); 
+router.get("/query", getTeachersByQuery); 
 router.post("/create", createTeacher); 
 router.put("/:id", updateTeacher); 
 

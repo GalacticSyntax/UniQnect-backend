@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { TeacherModel } from "./model/model";
-
+import catchAsync from "../../utils/catch.async";
+import QueryBuilder from "../../builder/QueryBuilder";
+import { sendResponse } from "../../utils/send.response";
+import httpStatus from "http-status";
+import { UserModel } from "../user/model/model";
 
 export const createTeacher = async (req: Request, res: Response) => {
   try {
@@ -12,7 +16,6 @@ export const createTeacher = async (req: Request, res: Response) => {
     res.status(400).json({ success: false, message: errMessage });
   }
 };
-
 
 export const updateTeacher = async (req: Request, res: Response) => {
   try {
@@ -35,20 +38,47 @@ export const updateTeacher = async (req: Request, res: Response) => {
   }
 };
 
+export const getAllTeachers = catchAsync(
+  async (req: Request, res: Response) => {
+    const query = req.query;
+    const userQuery = new QueryBuilder(
+      TeacherModel.find().populate({
+        path: "userId",
+      }),
+      query,
+    )
+      .search([])
+      .filter()
+      .sort()
+      .paginate()
+      .fields();
 
-export const getAllTeachers = async (_req: Request, res: Response) => {
+    const meta = await userQuery.countTotal();
+    const teachers = await userQuery.modelQuery.lean();
 
-  try {
-    
-    const teachers = await TeacherModel.find();
-    res.json({ success: true, data: teachers });
-  } catch (error) {
-    console.log("Hello");
-    const errMessage =
-      error instanceof Error ? error.message : "An unknown error occurred";
-    res.status(500).json({ success: false, message: errMessage });
-  }
-};
+    const result = teachers.map((teacher) => ({
+      ...teacher,
+      fullName: (teacher as unknown as { userId: { fullName: string } }).userId
+        .fullName,
+      email: (teacher as unknown as { userId: { email: string } }).userId.email,
+      phone: (teacher as unknown as { userId: { phone: string } }).userId.phone,
+      gender: (teacher as unknown as { userId: { gender: string } }).userId
+        .gender,
+      image: (teacher as unknown as { userId: { image: string } }).userId.image,
+      userId: (teacher as unknown as { userId: { _id: string } }).userId._id,
+    }));
+
+    return sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Teachers found successfully",
+      data: {
+        meta,
+        result,
+      },
+    });
+  },
+);
 
 export const getTeachersByQuery = async (req: Request, res: Response) => {
   try {
