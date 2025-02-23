@@ -37,6 +37,7 @@ export const getAllStudents = catchAsync(async (req, res) => {
     userId: (student as unknown as { userId: { _id: string } }).userId._id,
     department: (student as unknown as { departmentId: { name: string } })
       .departmentId.name,
+    departmentId: undefined,
   }));
 
   return sendResponse(res, {
