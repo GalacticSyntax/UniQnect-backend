@@ -109,10 +109,10 @@ export const getAllAdmissionOfficers = catchAsync(
 
 export const getUserById = catchAsync(async (req, res) => {
   const { id } = req.params;
-  let result = await UserModel.findById(id);
+  let result = (await UserModel.findById(id)) as any;
 
   if (result && result.role === "student") {
-    result = await StudentModel.findOne({
+    result = (await StudentModel.findOne({
       userId: result?._id.toString(),
     })
       .populate({
@@ -120,9 +120,9 @@ export const getUserById = catchAsync(async (req, res) => {
       })
       .populate({
         path: "departmentId",
-      });
+      })) as any;
   } else if (result && result.role === "teacher") {
-    result = await TeacherModel.findOne({
+    result = (await TeacherModel.findOne({
       userId: result?._id.toString(),
     })
       .populate({
@@ -130,7 +130,7 @@ export const getUserById = catchAsync(async (req, res) => {
       })
       .populate({
         path: "departmentId",
-      });
+      })) as any;
   }
 
   return sendResponse(res, {
