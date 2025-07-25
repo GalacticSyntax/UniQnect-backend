@@ -12,6 +12,7 @@ const app: Application = express();
  * middlewares
  *
  */
+app.use("/uploads", express.static("uploads"));
 app.use(
   cors({
     credentials: true,

@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import { Request, Response } from "express";
 import { UserModel } from "./model/model";
 import { v4 as uuid } from "uuid";
@@ -143,9 +145,46 @@ export const getUserById = catchAsync(async (req, res) => {
 
 export const updateUser = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const user = await UserModel.findByIdAndUpdate(id, req.body, { new: true });
 
-  if (!user) throw new AppError(httpStatus.NOT_FOUND, "user not found");
+  const payload = { ...req.body };
+
+  const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+
+  // 1️⃣ Find the user first
+  const existingUser = await UserModel.findById(id);
+  if (!existingUser) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  // 2️⃣ If a new image was uploaded...
+  if (files?.image?.[0]) {
+    const uploadedFile = files.image[0];
+    const fileName = uploadedFile.filename;
+    const fileUrl = `/uploads/${fileName}`;
+    payload["image"] = fileUrl;
+
+    // 3️⃣ If the user already had an image, delete the old file
+    const oldImagePath = existingUser.image;
+
+    if (oldImagePath) {
+      // oldImagePath might be "/uploads/filename.png"
+      const relativePath = oldImagePath.replace("/uploads/", "");
+      const fullPath = path.join(process.cwd(), "uploads", relativePath);
+
+      // Make sure the file exists before deleting
+      if (fs.existsSync(fullPath)) {
+        fs.unlinkSync(fullPath);
+        console.log("Deleted old image:", fullPath);
+      } else {
+        console.log("Old image not found, skip deleting");
+      }
+    }
+  }
+
+  // 4️⃣ Update the user with new payload
+  const user = await UserModel.findByIdAndUpdate(id, payload, { new: true });
+
+  if (!user) throw new AppError(httpStatus.NOT_FOUND, "User not found");
 
   return sendResponse(res, {
     statusCode: httpStatus.OK,
