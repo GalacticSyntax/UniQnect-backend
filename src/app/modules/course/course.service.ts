@@ -2,7 +2,7 @@ import { CourseModel } from "./model/model";
 import { ICourse } from "./course.interface";
 import { CourseUtils } from "./course.utils";
 
-export const createCourseService = async (data: {
+const createCourseService = async (data: {
   name: string;
   code: string;
   credit: number;
@@ -20,6 +20,30 @@ export const createCourseService = async (data: {
 };
 
 
+
+const createManyCoursesService = async (
+  courses: {
+    name: string;
+    code: string;
+    credit: number;
+    depart: string;
+    prerequisiteCourse: string[];
+  }[]
+) => {
+  const transformedCourses = [];
+
+  for (const course of courses) {
+    const prerequisiteIds = await CourseUtils.convertCourseCodesToIds(course.prerequisiteCourse, CourseModel);
+    transformedCourses.push({ ...course, prerequisiteCourse: prerequisiteIds });
+  }
+
+  const createdCourses = await CourseModel.insertMany(transformedCourses);
+  return createdCourses;
+};
+
+
+
 export const CourseService = {
   createCourseService,
+  createManyCoursesService,
 };

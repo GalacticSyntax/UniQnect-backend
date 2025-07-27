@@ -1,11 +1,11 @@
 import express from "express";
 const router = express.Router();
 
-import { createCourse } from "./course.controller";
+import { CourseController } from "./course.controller";
 
 
 
-router.post("/course", createCourse);
-
+router.post("/course", CourseController.createCourse);
+router.post("/courses", CourseController.createManyCourses);
 
 export const CourseRoutes = router;

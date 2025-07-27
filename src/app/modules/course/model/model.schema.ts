@@ -28,10 +28,9 @@ const courseSchema = new Schema<ICourse, ICourseModel>(
         {
           type: Schema.Types.ObjectId,
           ref: CourseConstant.COURSE_COLLECTION_NAME,
-          required: true,
         },
       ],
-      required: true,
+      default: [],
     },
   },
   {

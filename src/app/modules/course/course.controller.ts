@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
-import { createCourseService } from "./course.service";
-import { createCourseValidationSchema } from "./course.validation";
+import { CourseValidation } from "./course.validation";
+import { CourseService } from "./course.service";
 
-export const createCourse = async (req: Request, res: Response) => {
+
+const createCourse = async (req: Request, res: Response) => {
   try {
-    const validatedData = createCourseValidationSchema.parse(req.body);
-    const newCourse = await createCourseService(validatedData);
+    const validatedData = CourseValidation.createCourseValidationSchema.parse(req.body);
+    const newCourse = await CourseService.createCourseService(validatedData);
     res.status(201).json({ success: true, data: newCourse });
   } catch (err: any) {
     res.status(400).json({ success: false, message: err.message });
@@ -13,5 +14,24 @@ export const createCourse = async (req: Request, res: Response) => {
 };
 
 
+export const createManyCourses = async (req: Request, res: Response) => {
+  try {
+    const parsed = CourseValidation.createManyCoursesValidationSchema.parse(req.body);
 
-export const CourseController = {};
+    const saved = await CourseService.createManyCoursesService(parsed);
+    res.status(201).json({ success: true, data: saved });
+  } catch (err: any) {
+    res.status(400).json({
+      success: false,
+      message: err?.message || "Validation or creation error",
+    });
+  }
+};
+
+
+
+
+export const CourseController = {
+  createCourse,
+  createManyCourses,
+};

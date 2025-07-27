@@ -16,6 +16,7 @@ const convertCourseCodesToIds = async (
   return codes.map(code => codeToIdMap[code]);
 };
 
+
 export const CourseUtils = {
   convertCourseCodesToIds,
 };
