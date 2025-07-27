@@ -19,9 +19,8 @@ const courseSchema = new Schema<ICourse, ICourseModel>(
       type: Number,
       required: true,
     },
-    curriculumId: {
-      type: Schema.Types.ObjectId,
-      ref: CurriculumConstant.CURRICULUM_COLLECTION_NAME,
+    depart: {
+      type: String,
       required: true,
     },
     prerequisiteCourse: {
