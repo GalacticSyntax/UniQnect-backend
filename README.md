@@ -60,6 +60,7 @@ payload: {
 
 ```
 GET:    /advisors
+<!-- department, session, semester search, teacher name -->
 
 POST:   /advisor
 
@@ -67,7 +68,8 @@ payload: {
     departmentCode: string;
     session: string; fall-year
     semester: number;
-    teacherId: string;
+    teacherId: string; <!-- objectId -->
+    offeredCourses: [ObjectId] <!-- default [] no need to change when creating advisor -->
 }
 
 PATCH:   /advisor/:id
