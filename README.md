@@ -3,7 +3,7 @@
 ## courses
 
 ```
-GET     /courses 
+GET     /courses
 get all courses
 
 GET     /courses/:id
@@ -59,5 +59,74 @@ payload: {
 ## courses advisor
 
 ```
+GET:    /advisors
 
+POST:   /advisor
+
+payload: {
+    departmentCode: string;
+    session: string; fall-year
+    semester: number;
+    teacherId: string;
+}
+
+PATCH:   /advisor/:id
+
+payload: {
+    departmentCode: string;
+    session: string; fall-year
+    semester: number;
+    teacherId: string;
+    offeredCourses: [ObjectId] <!-- default [] no need to change when creating advisor -->
+}
+
+DELETE:   /advisor/:id
+
+=====================
+```
+
+## offered coures
+
+```
+GET:    /offered
+<!-- must add a field where show which course that student can't take so that I can disable them -->
+
+POST:   /offered
+
+payload: {
+    coures: [course_code]  <!-- but must need to change into ObjectId -->
+}
+
+PATCH:   /offered/:id <!-- advisor id -->
+
+payload: {
+    coures: [course_code]  <!-- but must need to change into ObjectId -->
+}
+
+=====================
+```
+
+## registered courses
+
+```
+GET:    /registered
+<!-- here check user role if user is student only can see his registered coureses else everyones -->
+This feature will be only for non students
+<!-- search by studentId, student name, course id, coruse name, semester -->
+GET:    /registered/:studentId
+
+POST:   /registered/:studentId
+
+payload: {
+    coures: [course_code]  <!-- but must need to change into ObjectId -->
+}
+
+PATCH:   /offered/:id <!-- advisor id -->
+
+payload: {
+    studentId: string; <!-- must change into ObjectId -->
+    coures: [course_code]  <!-- but must need to change into ObjectId -->
+}
+
+=====================
 ```
