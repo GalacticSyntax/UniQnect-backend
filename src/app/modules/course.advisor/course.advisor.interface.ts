@@ -1,7 +1,7 @@
 import { Model, Types } from "mongoose";
 import { TDocumentType } from "../../interface/interface";
 
-interface ICourseAdvisor {
+export interface ICourseAdvisor {
   departmentCode: string;
   teacherId: Types.ObjectId;
   session: string;
