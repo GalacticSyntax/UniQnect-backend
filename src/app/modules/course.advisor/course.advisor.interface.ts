@@ -1,10 +1,11 @@
 import { Model, Types } from "mongoose";
 import { TDocumentType } from "../../interface/interface";
 
-export interface ICourseAdvisor {
+interface ICourseAdvisor {
+  departmentCode: string;
   teacherId: Types.ObjectId;
-  runningSession: "" | "";
-  studentSession: "" | "";
+  session: string;
+  semester: number;
   offeredCourses: Array<Types.ObjectId>;
 }
 

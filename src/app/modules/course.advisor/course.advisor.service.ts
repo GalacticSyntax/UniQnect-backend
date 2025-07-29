@@ -1,1 +1,32 @@
-export const CourseAdvisorService = {};
+import { CourseAdvisorModel } from "./model/model";
+import { Types } from "mongoose";
+import { ICourseAdvisor } from "./course.advisor.interface";
+
+const createAdvisor = async (payload: ICourseAdvisor) => {
+  return CourseAdvisorModel.create(payload);
+};
+
+const getAdvisors = async (filters: any) => {
+  const query: any = {};
+  if (filters.department) query.departmentCode = new RegExp(filters.department, "i");
+  if (filters.session) query.session = filters.session;
+  if (filters.semester) query.semester = parseInt(filters.semester);
+  // If name filtering needed, join with teacher collection and filter via aggregation
+  return CourseAdvisorModel.find(query).populate("teacherId").populate("offeredCourses");
+};
+
+const updateAdvisor = async (id: string, payload: Partial<ICourseAdvisor>) => {
+  return CourseAdvisorModel.findByIdAndUpdate(id, payload, { new: true });
+};
+
+const deleteAdvisor = async (id: string) => {
+  return CourseAdvisorModel.findByIdAndDelete(id);
+};
+
+
+export const CourseAdvisorService = {
+  createAdvisor,
+  getAdvisors,
+  updateAdvisor,
+  deleteAdvisor
+};

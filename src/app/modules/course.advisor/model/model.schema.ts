@@ -8,19 +8,21 @@ import { CourseConstant } from "../../course/course.constant";
 
 const courseAdvisorSchema = new Schema<ICourseAdvisor, ICourseAdvisorModel>(
   {
+    departmentCode: {
+      type: String,
+      required: true,
+    },
     teacherId: {
       type: Schema.Types.ObjectId,
       ref: TeacherConstant.TEACHER_COLLECTION_NAME,
       required: true,
     },
-    runningSession: {
+    session: {
       type: String,
-      enum: ["", ""],
       required: true,
     },
-    studentSession: {
-      type: String,
-      enum: ["", ""],
+    semester: {
+      type: Number,
       required: true,
     },
     offeredCourses: {
@@ -28,10 +30,9 @@ const courseAdvisorSchema = new Schema<ICourseAdvisor, ICourseAdvisorModel>(
         {
           type: Schema.Types.ObjectId,
           ref: CourseConstant.COURSE_COLLECTION_NAME,
-          required: true,
         },
       ],
-      required: true,
+      default: [],
     },
   },
   {
