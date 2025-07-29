@@ -104,10 +104,13 @@ payload: {
 }
 <!-- here from the semester and runningSession you have to find the courseAdvisor id and put it in document  -->
 
-PATCH:   /offered/:id <!-- advisor id -->
+PATCH:   /offered/:id <!-- offered course id -->
 
 payload: {
-    coures: [course_code]  <!-- but must need to change into ObjectId -->
+    courseId;
+    runningSession;
+    teacherId;
+    semester;
 }
 
 =====================
