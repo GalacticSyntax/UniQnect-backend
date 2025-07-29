@@ -78,9 +78,21 @@ const deleteAdvisor = async (req: Request, res: Response) => {
   res.json({ success: true, data });
 };
 
+const getAdvisorById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const advisor = await CourseAdvisorService.findAdvisorById(id);
+
+  if (!advisor) {
+    return res.status(404).json({ success: false, message: 'Advisor not found' });
+  }
+
+  res.json({ success: true, data: advisor });
+};
+
 export const CourseAdvisorController = {
   createAdvisor,
   getAdvisors,
   updateAdvisor,
-  deleteAdvisor
+  deleteAdvisor,
+  getAdvisorById,
 };

@@ -23,10 +23,17 @@ const deleteAdvisor = async (id: string) => {
   return CourseAdvisorModel.findByIdAndDelete(id);
 };
 
+const findAdvisorById = async (id: string) => {
+  return CourseAdvisorModel.findById(id)
+    .populate('teacherId')       // Populate teacher details if needed
+    .populate('offeredCourses'); // Populate offered courses if needed
+};
+
 
 export const CourseAdvisorService = {
   createAdvisor,
   getAdvisors,
   updateAdvisor,
-  deleteAdvisor
+  deleteAdvisor,
+  findAdvisorById,
 };
