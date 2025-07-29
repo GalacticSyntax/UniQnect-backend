@@ -4,7 +4,7 @@ const router = express.Router();
 import { CourseController } from "./course.controller";
 
 
-
+router.get("/courses", CourseController.getCourses);
 router.post("/course", CourseController.createCourse);
 router.post("/courses", CourseController.createManyCourses);
 

@@ -29,9 +29,28 @@ export const createManyCourses = async (req: Request, res: Response) => {
 };
 
 
+const getCourses = async (req: Request, res: Response) => {
+  try {
+    const filters = {
+      code: typeof req.query.code === "string" ? req.query.code : undefined,
+      name: typeof req.query.name === "string" ? req.query.name : undefined,
+      depart: typeof req.query.depart === "string" ? req.query.depart : undefined,
+      credit: req.query.credit ? Number(req.query.credit) : undefined
+    };
+
+    const courses = await CourseService.getCoursesService(filters);
+    res.status(200).json({ success: true, data: courses });
+  } catch (err: any) {
+    res.status(400).json({
+      success: false,
+      message: err.message || "Failed to fetch courses"
+    });
+  }
+};
 
 
 export const CourseController = {
   createCourse,
   createManyCourses,
+  getCourses,
 };
