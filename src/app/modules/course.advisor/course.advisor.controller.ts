@@ -4,16 +4,36 @@ import { CourseAdvisorUtils } from "./course.advisor.utils";
 import { CourseAdvisorValidation } from "./course.advisor.validation";
 
 import { TeacherModel } from "../teacher/model/model";
-
+import { CourseAdvisorModel } from "./model/model";
 
 const createAdvisor = async (req: Request, res: Response) => {
-  const parsed = CourseAdvisorValidation.advisorValidationSchema.parse(req.body);
+  const parsed = CourseAdvisorValidation.advisorValidationSchema.parse(
+    req.body,
+  );
 
   // Find teacher by teacherId (string)
   const teacher = await TeacherModel.findOne({ teacherId: parsed.teacherId });
   if (!teacher) {
-    return res.status(404).json({ success: false, message: 'Teacher not found' });
+    return res
+      .status(404)
+      .json({ success: false, message: "Teacher not found" });
   }
+
+  console.log(teacher);
+
+  const isAlreadyExist = await CourseAdvisorModel.findOne({
+    teacherId: teacher._id,
+    session: parsed.session,
+    semester: parsed.semester,
+  });
+
+  console.log(isAlreadyExist);
+
+  if (isAlreadyExist)
+    return res.json({
+      success: false,
+      message: "Already it is created",
+    });
 
   // Replace teacherId with _id
   // parsed.teacherId = teacher._id;
@@ -31,10 +51,12 @@ const createAdvisor = async (req: Request, res: Response) => {
     session: parsed.session,
     semester: parsed.semester,
     teacherId: teacher._id,
-    offeredCourses: parsed.offeredCourses 
-  }
+    offeredCourses: parsed.offeredCourses,
+  };
 
-  const data = await CourseAdvisorService.createAdvisor(CourseAdvisorUtils.formatAdvisorPayload(updated));
+  const data = await CourseAdvisorService.createAdvisor(
+    CourseAdvisorUtils.formatAdvisorPayload(updated),
+  );
   res.status(201).json({ success: true, data });
 };
 
@@ -51,11 +73,15 @@ const getAdvisors = async (req: Request, res: Response) => {
 
 const updateAdvisor = async (req: Request, res: Response) => {
   const id = req.params.id;
-  const parsed = CourseAdvisorValidation.advisorValidationSchema.parse(req.body);
+  const parsed = CourseAdvisorValidation.advisorValidationSchema.parse(
+    req.body,
+  );
 
   const teacher = await TeacherModel.findOne({ teacherId: parsed.teacherId });
   if (!teacher) {
-    return res.status(404).json({ success: false, message: 'Teacher not found' });
+    return res
+      .status(404)
+      .json({ success: false, message: "Teacher not found" });
   }
 
   // parsed.teacherId = teacher._id;
@@ -65,10 +91,13 @@ const updateAdvisor = async (req: Request, res: Response) => {
     session: parsed.session,
     semester: parsed.semester,
     teacherId: teacher._id,
-    offeredCourses: parsed.offeredCourses 
-  }
+    offeredCourses: parsed.offeredCourses,
+  };
 
-  const data = await CourseAdvisorService.updateAdvisor(id, CourseAdvisorUtils.formatAdvisorPayload(updated));
+  const data = await CourseAdvisorService.updateAdvisor(
+    id,
+    CourseAdvisorUtils.formatAdvisorPayload(updated),
+  );
   res.json({ success: true, data });
 };
 
@@ -83,7 +112,9 @@ const getAdvisorById = async (req: Request, res: Response) => {
   const advisor = await CourseAdvisorService.findAdvisorById(id);
 
   if (!advisor) {
-    return res.status(404).json({ success: false, message: 'Advisor not found' });
+    return res
+      .status(404)
+      .json({ success: false, message: "Advisor not found" });
   }
 
   res.json({ success: true, data: advisor });
