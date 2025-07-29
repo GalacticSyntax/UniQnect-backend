@@ -71,6 +71,7 @@ payload: {
     teacherId: string; <!-- objectId -->
     offeredCourses: [ObjectId] <!-- default [] no need to change when creating advisor -->
 }
+<!-- must can't have multiple advisor with same teacher id and sessions -->
 
 PATCH:   /advisor/:id
 
