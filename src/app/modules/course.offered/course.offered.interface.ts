@@ -3,7 +3,7 @@ import { TDocumentType } from "../../interface/interface";
 
 export interface ICourseOffered {
   courseId: Types.ObjectId;
-  runningSession: "" | "";
+  runningSession: string;
   courseAdvisor: Types.ObjectId;
   teacherId: Types.ObjectId;
 }
