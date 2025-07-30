@@ -29,7 +29,6 @@ const registeredCourseSchema = new Schema<
     },
     runningSession: {
       type: String,
-      enum: ["", ""],
       required: true,
     },
   },

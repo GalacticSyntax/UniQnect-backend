@@ -16,7 +16,6 @@ const courseOfferedSchema = new Schema<ICourseOffered, ICourseOfferedModel>(
     },
     runningSession: {
       type: String,
-      enum: ["", ""],
       required: true,
     },
     courseAdvisor: {
