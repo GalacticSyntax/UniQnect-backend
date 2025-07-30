@@ -6,6 +6,21 @@ import { CourseAdvisorValidation } from "./course.advisor.validation";
 import { TeacherModel } from "../teacher/model/model";
 import { CourseAdvisorModel } from "./model/model";
 
+
+const checkIfUserIsAdvisorController = async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  if (!userId) {
+    return res.status(400).json({ success: false, message: "userId is required" });
+  }
+
+  const advisor = await CourseAdvisorUtils.checkIfUserIsAdvisor(userId);
+  if (!advisor) {
+    return res.status(404).json({ success: false, message: "User is not a course advisor" });
+  }
+
+  res.json({ success: true, data: advisor });
+};
+
 const createAdvisor = async (req: Request, res: Response) => {
   const parsed = CourseAdvisorValidation.advisorValidationSchema.parse(
     req.body,
@@ -126,4 +141,5 @@ export const CourseAdvisorController = {
   updateAdvisor,
   deleteAdvisor,
   getAdvisorById,
+  checkIfUserIsAdvisorController,
 };

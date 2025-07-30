@@ -10,4 +10,6 @@ router.post("/advisor", CourseAdvisorController.createAdvisor);
 router.patch("/advisor/:id", CourseAdvisorController.updateAdvisor);
 router.delete("/advisor/:id", CourseAdvisorController.deleteAdvisor);
 
+router.get("/advisor/check/:userId", CourseAdvisorController.checkIfUserIsAdvisorController);
+
 export const CourseAdvisorRoutes = router;

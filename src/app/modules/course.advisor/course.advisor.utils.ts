@@ -1,3 +1,7 @@
+import { TeacherModel } from "../teacher/model/model";
+import { CourseAdvisorModel } from "./model/model";
+
+
 const formatAdvisorPayload = (payload: any) => {
   return {
     ...payload,
@@ -6,6 +10,21 @@ const formatAdvisorPayload = (payload: any) => {
   };
 };
 
+
+export const checkIfUserIsAdvisor = async (userId: string) => {
+  const teacher = await TeacherModel.findOne({ userId });
+  if (!teacher) return null;
+
+  const advisor = await CourseAdvisorModel.findOne({ teacherId: teacher._id })
+    .populate({
+      path: "teacherId",
+      populate: { path: "userId" },
+    });
+
+  return advisor;
+};
+
 export const CourseAdvisorUtils = {
   formatAdvisorPayload,
+  checkIfUserIsAdvisor,
 };
