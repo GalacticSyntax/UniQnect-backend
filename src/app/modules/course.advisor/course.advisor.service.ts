@@ -12,7 +12,13 @@ const getAdvisors = async (filters: any) => {
   if (filters.session) query.session = filters.session;
   if (filters.semester) query.semester = parseInt(filters.semester);
   // If name filtering needed, join with teacher collection and filter via aggregation
-  return CourseAdvisorModel.find(query).populate("teacherId").populate("offeredCourses");
+  // return CourseAdvisorModel.find(query).populate("teacherId").populate("offeredCourses");
+  return CourseAdvisorModel.find(query).populate({
+    path: 'teacherId',
+    populate: {
+      path: 'userId', // this must be a valid ref in the Teacher schema
+    },
+  }).populate("offeredCourses");
 };
 
 const updateAdvisor = async (id: string, payload: Partial<ICourseAdvisor>) => {
