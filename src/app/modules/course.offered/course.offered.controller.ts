@@ -90,6 +90,34 @@ const deleteCourseOffered = async (req: Request, res: Response) => {
   res.json({ success: true, data });
 };
 
+const getOfferedCoursesByAdvisorUserId = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    if (!userId) {
+      return res.status(400).json({ success: false, message: "userId is required" });
+    }
+
+    // Find the teacher by userId
+    const teacher = await TeacherModel.findOne({ userId });
+    if (!teacher) {
+      return res.status(404).json({ success: false, message: "Teacher not found" });
+    }
+
+    // Find the advisor by teacherId
+    const advisor = await CourseAdvisorModel.findOne({ teacherId: teacher._id });
+    if (!advisor) {
+      return res.status(404).json({ success: false, message: "Advisor not found" });
+    }
+
+    // Find all offered courses by advisorId
+    const courses = await CourseOfferedService.getCourseOffereds({ courseAdvisor: advisor._id });
+
+    res.json({ success: true, data: courses });
+  } catch (err: any) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
+
 const getCourseOfferedById = async (req: Request, res: Response) => {
   const { id } = req.params;
   const data = await CourseOfferedService.findCourseOfferedById(id);
@@ -105,4 +133,5 @@ export const CourseOfferedController = {
   updateCourseOffered,
   deleteCourseOffered,
   getCourseOfferedById,
+  getOfferedCoursesByAdvisorUserId,
 };

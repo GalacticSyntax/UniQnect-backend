@@ -9,4 +9,6 @@ router.post("/offered", CourseOfferedController.createCourseOffered);
 router.patch("/offered/:id", CourseOfferedController.updateCourseOffered);
 router.delete("/offered/:id", CourseOfferedController.deleteCourseOffered);
 
+router.get("/advisor/offered-courses/:userId", CourseOfferedController.getOfferedCoursesByAdvisorUserId);
+
 export const CourseOfferedRoutes = router;
