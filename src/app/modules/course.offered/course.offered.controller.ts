@@ -7,17 +7,24 @@ import { CourseAdvisorModel } from "../course.advisor/model/model";
 import { TeacherModel } from "../teacher/model/model";
 
 import { Types } from "mongoose";
+import { run } from "node:test";
 
 const createCourseOffered = async (req: Request, res: Response) => {
   try {
+    
     const parsed = CourseOfferedValidation.createCourseOfferedValidationSchema.parse(req.body);
-
+    
+    // console.log(parsed);
+    
     // Search for referenced documents
     const [course, courseAdvisor, teacher] = await Promise.all([
-      CourseModel.findById(parsed.courseId),
+      CourseModel.findOne({code: parsed.courseId}),
       CourseAdvisorModel.findById(parsed.courseAdvisor),
-      TeacherModel.findById(parsed.teacherId),
+      TeacherModel.findOne({teacherId: parsed.teacherId}),
     ]);
+
+    console.log(course);
+    
 
     if (!course) {
       return res.status(404).json({ success: false, message: "Course not found" });
@@ -30,11 +37,13 @@ const createCourseOffered = async (req: Request, res: Response) => {
     }
 
     const payload = {
-      ...parsed,
+      runningSession: parsed.runningSession,
       courseId: course._id,
       courseAdvisor: courseAdvisor._id,
       teacherId: teacher._id,
     };
+
+    
 
     const data = await CourseOfferedService.createCourseOffered(payload);
     res.status(201).json({ success: true, data });
