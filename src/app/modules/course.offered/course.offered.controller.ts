@@ -57,6 +57,8 @@ const getCourseOffereds = async (req: Request, res: Response) => {
   res.json({ success: true, data });
 };
 
+
+
 const updateCourseOffered = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;

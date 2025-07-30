@@ -7,7 +7,13 @@ const createCourseOffered = async (payload: ICourseOffered) => {
 
 const getCourseOffereds = async (filters: any = {}) => {
   return CourseOfferedModel.find(filters)
-    .populate("courseId")
+    .populate({
+      path: "courseId",
+      populate: {
+        path: "prerequisiteCourse", // assumes the field is named 'prerequisites' in CourseModel
+        model: "course",       // use your actual course collection/model name if different
+      },
+    })
     .populate("courseAdvisor")
     .populate("teacherId");
 };

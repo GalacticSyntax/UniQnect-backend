@@ -27,9 +27,9 @@ let server: Server;
   }
 })();
 
-process.on("unhandledRejection", () => {
+process.on("unhandledRejection", (reason, promise) => {
   // eslint-disable-next-line no-console
-  console.log("unhandledRejection is detected.....");
+  console.error("Unhandled Rejection at:", promise, "reason:", reason);
 
   if (server) return server?.close(() => process.exit(1));
 
