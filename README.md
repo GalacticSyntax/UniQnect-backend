@@ -140,3 +140,27 @@ payload: {
 
 =====================
 ```
+
+## Department Head
+```
+========================
+GET     /is-department-head <!-- I will pass userId -->
+
+GET     /department-head
+
+POST    /department-head    
+
+payload {
+    course_code: string;
+    teacher_code: string;
+}
+
+PATCH /department-head/:id
+
+payload {
+    course_code: string;
+    teacher_code: string;
+}
+
+========================
+```
