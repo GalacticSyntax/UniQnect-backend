@@ -69,10 +69,10 @@ const moduleRoutes: Array<IRouteSchema> = [
     path: "/course-advisor",
     route: CourseAdvisorRoutes,
   },
-  // {
-  //   path: "/department-head",
-  //   route: DepartmentHeadRoutes,
-  // },
+  {
+    path: "/department-head",
+    route: DepartmentHeadRoutes,
+  },
   {
     path: "/course",
     route: CourseRoutes,
