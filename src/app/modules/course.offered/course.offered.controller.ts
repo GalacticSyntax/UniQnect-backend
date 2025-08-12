@@ -6,34 +6,38 @@ import { CourseModel } from "../course/model/model";
 import { CourseAdvisorModel } from "../course.advisor/model/model";
 import { TeacherModel } from "../teacher/model/model";
 
-import { Types } from "mongoose";
-import { run } from "node:test";
-
 const createCourseOffered = async (req: Request, res: Response) => {
   try {
-    
-    const parsed = CourseOfferedValidation.createCourseOfferedValidationSchema.parse(req.body);
-    
-    // console.log(parsed);
-    
+    const parsed =
+      CourseOfferedValidation.createCourseOfferedValidationSchema.parse(
+        req.body,
+      );
+
     // Search for referenced documents
     const [course, courseAdvisor, teacher] = await Promise.all([
-      CourseModel.findOne({code: parsed.courseId}),
+      CourseModel.findOne({ code: parsed.courseId.trim().toLowerCase() }),
       CourseAdvisorModel.findById(parsed.courseAdvisor),
-      TeacherModel.findOne({teacherId: parsed.teacherId}),
+      TeacherModel.findOne({
+        teacherId: new RegExp(`^${parsed.teacherId.trim()}$`, "i"),
+      }),
     ]);
 
     console.log(course);
-    
 
     if (!course) {
-      return res.status(404).json({ success: false, message: "Course not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Course not found" });
     }
     if (!courseAdvisor) {
-      return res.status(404).json({ success: false, message: "Course advisor not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Course advisor not found" });
     }
     if (!teacher) {
-      return res.status(404).json({ success: false, message: "Teacher not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Teacher not found" });
     }
 
     const payload = {
@@ -42,8 +46,6 @@ const createCourseOffered = async (req: Request, res: Response) => {
       courseAdvisor: courseAdvisor._id,
       teacherId: teacher._id,
     };
-
-    
 
     const data = await CourseOfferedService.createCourseOffered(payload);
     res.status(201).json({ success: true, data });
@@ -57,12 +59,13 @@ const getCourseOffereds = async (req: Request, res: Response) => {
   res.json({ success: true, data });
 };
 
-
-
 const updateCourseOffered = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
-    const parsed = CourseOfferedValidation.createCourseOfferedValidationSchema.parse(req.body);
+    const parsed =
+      CourseOfferedValidation.createCourseOfferedValidationSchema.parse(
+        req.body,
+      );
 
     // Search for referenced documents
     const [course, courseAdvisor, teacher] = await Promise.all([
@@ -72,13 +75,19 @@ const updateCourseOffered = async (req: Request, res: Response) => {
     ]);
 
     if (!course) {
-      return res.status(404).json({ success: false, message: "Course not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Course not found" });
     }
     if (!courseAdvisor) {
-      return res.status(404).json({ success: false, message: "Course advisor not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Course advisor not found" });
     }
     if (!teacher) {
-      return res.status(404).json({ success: false, message: "Teacher not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Teacher not found" });
     }
 
     const payload = {
@@ -101,27 +110,40 @@ const deleteCourseOffered = async (req: Request, res: Response) => {
   res.json({ success: true, data });
 };
 
-const getOfferedCoursesByAdvisorUserId = async (req: Request, res: Response) => {
+const getOfferedCoursesByAdvisorUserId = async (
+  req: Request,
+  res: Response,
+) => {
   try {
     const { userId } = req.params;
     if (!userId) {
-      return res.status(400).json({ success: false, message: "userId is required" });
+      return res
+        .status(400)
+        .json({ success: false, message: "userId is required" });
     }
 
     // Find the teacher by userId
     const teacher = await TeacherModel.findOne({ userId });
     if (!teacher) {
-      return res.status(404).json({ success: false, message: "Teacher not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Teacher not found" });
     }
 
     // Find the advisor by teacherId
-    const advisor = await CourseAdvisorModel.findOne({ teacherId: teacher._id });
+    const advisor = await CourseAdvisorModel.findOne({
+      teacherId: teacher._id,
+    });
     if (!advisor) {
-      return res.status(404).json({ success: false, message: "Advisor not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Advisor not found" });
     }
 
     // Find all offered courses by advisorId
-    const courses = await CourseOfferedService.getCourseOffereds({ courseAdvisor: advisor._id });
+    const courses = await CourseOfferedService.getCourseOffereds({
+      courseAdvisor: advisor._id,
+    });
 
     res.json({ success: true, data: courses });
   } catch (err: any) {
