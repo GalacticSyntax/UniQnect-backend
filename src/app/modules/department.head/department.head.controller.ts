@@ -33,7 +33,7 @@ const createDepartmentHead = async (req: Request, res: Response) => {
     const parsed = DepartmentHeadValidation.createDepartmentHeadSchema.parse(req.body);
 
     // Find teacher by userId
-    const teacher = await TeacherModel.findOne({ userId: parsed.teacherId }); // here teacherId actually means userId in payload
+    const teacher = await TeacherModel.findOne({ teacherId: parsed.teacherId }); // here teacherId actually means userId in payload
     if (!teacher) {
       return res.status(404).json({ success: false, message: "Teacher not found for given userId" });
     }
