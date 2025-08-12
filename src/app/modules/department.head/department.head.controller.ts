@@ -1,145 +1,85 @@
 import { Request, Response } from "express";
-import { CourseAdvisorService } from "./department.head.service";
-import { CourseAdvisorUtils } from "./department.head.utils";
-import { CourseAdvisorValidation } from "./course.advisor.validation";
-
+import { DepartmentHeadService } from "./department.head.service";
+import { DepartmentHeadValidation } from "./department.head.validation";
+import { DepartmentHeadUtils } from "./department.head.utils";
 import { TeacherModel } from "../teacher/model/model";
-import { CourseAdvisorModel } from "./model/model";
+import { IDepartmentHead } from "./department.head.interface";
 
-
-const checkIfUserIsAdvisorController = async (req: Request, res: Response) => {
-  const { userId } = req.params;
-  if (!userId) {
-    return res.status(400).json({ success: false, message: "userId is required" });
+const isDepartmentHead = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.query;
+    if (!userId) {
+      return res.status(400).json({ success: false, message: "userId is required" });
+    }
+    const result = await DepartmentHeadService.isDepartmentHead(String(userId));
+    res.status(200).json({ success: true, isDepartmentHead: result });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
   }
-
-  const advisor = await CourseAdvisorUtils.checkIfUserIsAdvisor(userId);
-  if (!advisor) {
-    return res.status(404).json({ success: false, message: "User is not a course advisor" });
-  }
-
-  res.json({ success: true, data: advisor });
 };
 
-const createAdvisor = async (req: Request, res: Response) => {
-  const parsed = CourseAdvisorValidation.advisorValidationSchema.parse(
-    req.body,
-  );
-
-  // Find teacher by teacherId (string)
-  const teacher = await TeacherModel.findOne({ teacherId: parsed.teacherId });
-  if (!teacher) {
-    return res
-      .status(404)
-      .json({ success: false, message: "Teacher not found" });
+const getDepartmentHeads = async (req: Request, res: Response) => {
+  try {
+    const result = await DepartmentHeadService.getDepartmentHeads();
+    res.status(200).json({ success: true, data: result });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
   }
+};
 
-  console.log(teacher);
+const createDepartmentHead = async (req: Request, res: Response) => {
+  try {
+    // Parse request body
+    const parsed = DepartmentHeadValidation.createDepartmentHeadSchema.parse(req.body);
 
-  const isAlreadyExist = await CourseAdvisorModel.findOne({
-    teacherId: teacher._id,
-    session: parsed.session,
-    semester: parsed.semester,
-  });
+    // Find teacher by userId
+    const teacher = await TeacherModel.findOne({ userId: parsed.teacherId }); // here teacherId actually means userId in payload
+    if (!teacher) {
+      return res.status(404).json({ success: false, message: "Teacher not found for given userId" });
+    }
 
-  console.log(isAlreadyExist);
-
-  if (isAlreadyExist)
-    return res.json({
-      success: false,
-      message: "Already it is created",
+    // Replace teacherId with the actual _id
+    const payload = DepartmentHeadUtils.formatCreatePayload({
+      departmentCode: parsed.departmentCode,
+      teacherId: teacher._id,
     });
 
-  // Replace teacherId with _id
-  // parsed.teacherId = teacher._id;
+    // Save Department Head
+    const result = await DepartmentHeadService.createDepartmentHead(payload);
 
-  // const parsed: {
-  //   departmentCode: string;
-  //   session: string;
-  //   semester: number;
-  //   teacherId: string;
-  //   offeredCourses?: string[] | undefined;
-  // }
-
-  const updated = {
-    departmentCode: parsed.departmentCode,
-    session: parsed.session,
-    semester: parsed.semester,
-    teacherId: teacher._id,
-    offeredCourses: parsed.offeredCourses,
-  };
-
-  const data = await CourseAdvisorService.createAdvisor(
-    CourseAdvisorUtils.formatAdvisorPayload(updated),
-  );
-  res.status(201).json({ success: true, data });
-};
-
-const getAdvisors = async (req: Request, res: Response) => {
-  const { department, session, semester, name } = req.query;
-  const data = await CourseAdvisorService.getAdvisors({
-    department,
-    session,
-    semester,
-    name,
-  });
-  res.json({ success: true, data });
-};
-
-const updateAdvisor = async (req: Request, res: Response) => {
-  const id = req.params.id;
-  const parsed = CourseAdvisorValidation.advisorValidationSchema.parse(
-    req.body,
-  );
-
-  const teacher = await TeacherModel.findOne({ teacherId: parsed.teacherId });
-  if (!teacher) {
-    return res
-      .status(404)
-      .json({ success: false, message: "Teacher not found" });
+    res.status(201).json({ success: true, data: result });
+  } catch (error: any) {
+    res.status(400).json({ success: false, message: error.message });
   }
-
-  // parsed.teacherId = teacher._id;
-
-  const updated = {
-    departmentCode: parsed.departmentCode,
-    session: parsed.session,
-    semester: parsed.semester,
-    teacherId: teacher._id,
-    offeredCourses: parsed.offeredCourses,
-  };
-
-  const data = await CourseAdvisorService.updateAdvisor(
-    id,
-    CourseAdvisorUtils.formatAdvisorPayload(updated),
-  );
-  res.json({ success: true, data });
 };
 
-const deleteAdvisor = async (req: Request, res: Response) => {
-  const id = req.params.id;
-  const data = await CourseAdvisorService.deleteAdvisor(id);
-  res.json({ success: true, data });
-};
+const updateDepartmentHead = async (req: Request, res: Response) => {
+  try {
+    const parsed = DepartmentHeadValidation.updateDepartmentHeadSchema.parse(req.body);
+    let payload: Partial<IDepartmentHead> = {};
 
-const getAdvisorById = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const advisor = await CourseAdvisorService.findAdvisorById(id);
+    // If userId (or teacherId in current schema) is provided, find teacher._id
+    if (parsed.teacherId) { 
+      const teacher = await TeacherModel.findOne({ userId: parsed.teacherId }); // parsed.teacherId actually means userId
+      if (!teacher) {
+        return res.status(404).json({ success: false, message: "Teacher not found for given userId" });
+      }
+      payload.teacherId = teacher._id; // Use teacher._id for the update
+    }
 
-  if (!advisor) {
-    return res
-      .status(404)
-      .json({ success: false, message: "Advisor not found" });
+    let payload1 = DepartmentHeadUtils.formatUpdatePayload(payload);
+
+    const result = await DepartmentHeadService.updateDepartmentHead(req.params.id, payload);
+    res.status(200).json({ success: true, data: result });
+  } catch (error: any) {
+    res.status(400).json({ success: false, message: error.message });
   }
-
-  res.json({ success: true, data: advisor });
 };
+
 
 export const DepartmentHeadController = {
-  createAdvisor,
-  getAdvisors,
-  updateAdvisor,
-  deleteAdvisor,
-  getAdvisorById,
-  checkIfUserIsAdvisorController,
+  isDepartmentHead,
+  getDepartmentHeads,
+  createDepartmentHead,
+  updateDepartmentHead,
 };

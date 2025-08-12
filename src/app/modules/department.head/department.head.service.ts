@@ -1,45 +1,37 @@
+import { DepartmentHeadModel } from "./model/model";
+import { TeacherModel } from "../teacher/model/model";
+import { IDepartmentHead } from "./department.head.interface";
+import mongoose from "mongoose";
 
+const isDepartmentHead = async (userId: string) => {
+  const teacher = await TeacherModel.findOne({ userId });
+  if (!teacher) return false;
 
-const createAdvisor = async (payload: ICourseAdvisor) => {
-  return CourseAdvisorModel.create(payload);
+  const deptHead = await DepartmentHeadModel.findOne({ teacherId: teacher._id });
+  return !!deptHead;
 };
 
-const getAdvisors = async (filters: any) => {
-  const query: any = {};
-  if (filters.department)
-    query.departmentCode = new RegExp(filters.department, "i");
-  if (filters.session) query.session = filters.session;
-  if (filters.semester) query.semester = parseInt(filters.semester);
-  // If name filtering needed, join with teacher collection and filter via aggregation
-  // return CourseAdvisorModel.find(query).populate("teacherId").populate("offeredCourses");
-  return CourseAdvisorModel.find(query)
-    .populate({
-      path: "teacherId",
-      populate: {
-        path: "userId", // this must be a valid ref in the Teacher schema
-      },
-    })
-    .populate("offeredCourses");
+const getDepartmentHeads = async () => {
+  return DepartmentHeadModel.find().populate("teacherId");
 };
 
-const updateAdvisor = async (id: string, payload: Partial<ICourseAdvisor>) => {
-  return CourseAdvisorModel.findByIdAndUpdate(id, payload, { new: true });
+const createDepartmentHead = async (payload: IDepartmentHead) => {
+  return DepartmentHeadModel.create(payload);
 };
 
-const deleteAdvisor = async (id: string) => {
-  return CourseAdvisorModel.findByIdAndDelete(id);
-};
-
-const findAdvisorById = async (id: string) => {
-  return CourseAdvisorModel.findById(id)
-    .populate("teacherId") // Populate teacher details if needed
-    .populate("offeredCourses"); // Populate offered courses if needed
+const updateDepartmentHead = async (
+  id: string,
+  payload: Partial<IDepartmentHead>
+) => {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new Error("Invalid department head ID");
+  }
+  return DepartmentHeadModel.findByIdAndUpdate(id, payload, { new: true });
 };
 
 export const DepartmentHeadService = {
-  createAdvisor,
-  getAdvisors,
-  updateAdvisor,
-  deleteAdvisor,
-  findAdvisorById,
+  isDepartmentHead,
+  getDepartmentHeads,
+  createDepartmentHead,
+  updateDepartmentHead,
 };

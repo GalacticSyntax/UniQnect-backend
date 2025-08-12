@@ -16,7 +16,7 @@ import { AttendanceRoutes } from "../modules/attendance/attendance.route";
 import { AdminRoutes } from "../modules/admin/admin.route";
 import { CourseRegisteredRoutes } from "../modules/course.registered/course.registered.route";
 import { AuthRoutes } from "../modules/auth/auth.route";
-import { DepartmentHeadRoutes } from "../modules/department.head/department.head";
+import { DepartmentHeadRoutes } from "../modules/department.head/department.head.route";
 
 const router = express.Router();
 

@@ -151,15 +151,15 @@ GET     /department-head
 POST    /department-head    
 
 payload {
-    course_code: string;
-    teacher_code: string;
+    departmentCode: string;
+    teacherId: string;
 }
 
 PATCH /department-head/:id
 
 payload {
-    course_code: string;
-    teacher_code: string;
+    departmentCode: string;
+    teacherId: string;
 }
 
 ========================
