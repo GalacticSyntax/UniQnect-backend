@@ -1,7 +1,5 @@
 import { CourseOfferedModel } from "./model/model";
 import { ICourseOffered } from "./course.offered.interface";
-import path from "path";
-import { populate } from "dotenv";
 
 const createCourseOffered = async (payload: ICourseOffered) => {
   return CourseOfferedModel.create(payload);
@@ -12,8 +10,7 @@ const getCourseOffereds = async (filters: any = {}) => {
     .populate({
       path: "courseId",
       populate: {
-        path: "prerequisiteCourse", // assumes the field is named 'prerequisites' in CourseModel
-        model: "course",       // use your actual course collection/model name if different
+        path: "prerequisiteCourse",
       },
     })
     .populate({
@@ -22,7 +19,6 @@ const getCourseOffereds = async (filters: any = {}) => {
         path: "teacherId",
         populate: {
           path: "userId",
-          model: "User", 
         }
       }
     })
@@ -30,7 +26,6 @@ const getCourseOffereds = async (filters: any = {}) => {
       path: "teacherId", 
       populate: {
         path: "userId", 
-        model: "User",  
       },
     })
 };
