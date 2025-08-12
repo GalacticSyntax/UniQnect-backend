@@ -60,7 +60,7 @@ const updateDepartmentHead = async (req: Request, res: Response) => {
 
     // If userId (or teacherId in current schema) is provided, find teacher._id
     if (parsed.teacherId) { 
-      const teacher = await TeacherModel.findOne({ userId: parsed.teacherId }); // parsed.teacherId actually means userId
+      const teacher = await TeacherModel.findOne({ teacherId: parsed.teacherId }); // parsed.teacherId actually means userId
       if (!teacher) {
         return res.status(404).json({ success: false, message: "Teacher not found for given userId" });
       }
