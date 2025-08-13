@@ -21,7 +21,7 @@ const registerCourseService = async (data: CourseRegistrationBody) => {
   const registration = await CourseRegisteredModel.create({
     studentId: student._id,
     courseId: data.courseId,
-    sessionId: runningSession._id,
+    sessionId: runningSession?.running,
   });
 
   return registration;
