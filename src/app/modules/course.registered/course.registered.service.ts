@@ -2,6 +2,7 @@ import { CourseRegistrationBody } from "./course.registered.validation";
 import { sessionModel } from "../session/model/model";
 import { CourseRegisteredModel } from "./model/model";
 import { StudentModel } from "../student/model/model";
+import mongoose from "mongoose";
 
 const registerCourseService = async (data: CourseRegistrationBody) => {
   // Get the running session
@@ -15,14 +16,33 @@ const registerCourseService = async (data: CourseRegistrationBody) => {
     throw new Error("Student not found");
   }
 
-  // const courseIds
-
-  // Create course registration
-  const registration = await CourseRegisteredModel.create({
+  // Check if the student already has a registration for this session
+  let registration = await CourseRegisteredModel.findOne({
     studentId: student._id,
-    courseList: data.courseId,
-    runningSession: runningSession?.running,
+    runningSession: runningSession.running,
   });
+
+  if (registration) {
+    // Merge new courses with existing, avoiding duplicates
+    const updatedCourses = Array.from(
+      new Set([
+        ...registration.courseList.map((id) => id.toString()),
+        ...data.courseId.map((id) => id.toString()),
+      ])
+    ).map((id) => new mongoose.Types.ObjectId(id)); // convert back to ObjectId
+
+    registration.courseList = updatedCourses;
+    await registration.save();
+  } else {
+    // Create a new registration
+    registration = await CourseRegisteredModel.create({
+      studentId: student._id,
+      courseList: [...new Set(data.courseId.map((id) => id.toString()))].map(
+        (id) => new mongoose.Types.ObjectId(id)
+      ),
+      runningSession: runningSession.running,
+    });
+  }
 
   return registration;
 };
