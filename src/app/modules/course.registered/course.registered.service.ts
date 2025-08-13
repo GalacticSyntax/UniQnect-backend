@@ -1,6 +1,6 @@
 import { CourseRegistrationBody } from "./course.registered.validation";
-import {sessionModel} from "../session/model/model";
-import {CourseRegisteredModel} from "./model/model";
+import { sessionModel } from "../session/model/model";
+import { CourseRegisteredModel } from "./model/model";
 import { StudentModel } from "../student/model/model";
 
 const registerCourseService = async (data: CourseRegistrationBody) => {
@@ -10,7 +10,7 @@ const registerCourseService = async (data: CourseRegistrationBody) => {
     throw new Error("No running session found");
   }
 
-  const student = await StudentModel.findOne({ studentId: data.studentId })
+  const student = await StudentModel.findOne({ studentId: data.studentId });
   if (!student) {
     throw new Error("Student not found");
   }
@@ -20,17 +20,18 @@ const registerCourseService = async (data: CourseRegistrationBody) => {
   // Create course registration
   const registration = await CourseRegisteredModel.create({
     studentId: student._id,
-    courseId: data.courseId,
-    sessionId: runningSession?.running,
+    courseList: data.courseId,
+    runningSession: runningSession?.running,
   });
 
   return registration;
 };
 
 const getCourseRegistrationsService = async () => {
-  return await CourseRegisteredModel.find().populate("studentId courseId sessionId");
+  return await CourseRegisteredModel.find().populate(
+    "studentId courseId sessionId",
+  );
 };
-
 
 export const CourseRegisteredService = {
   registerCourseService,
