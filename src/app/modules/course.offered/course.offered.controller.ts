@@ -160,6 +160,34 @@ const getCourseOfferedById = async (req: Request, res: Response) => {
   res.json({ success: true, data });
 };
 
+const myCoursesAsTeacher = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    if (!userId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "userId is required" });
+    }
+
+    // Find the teacher by userId
+    const teacher = await TeacherModel.findOne({ userId });
+    if (!teacher) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Teacher not found" });
+    }
+
+    // Find all offered courses by teacherId
+    const courses = await CourseOfferedService.getCourseOffereds({
+      teacherId: teacher._id,
+    });
+
+    res.json({ success: true, data: courses });
+  } catch (err: any) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+}
+
 export const CourseOfferedController = {
   createCourseOffered,
   getCourseOffereds,
@@ -167,4 +195,5 @@ export const CourseOfferedController = {
   deleteCourseOffered,
   getCourseOfferedById,
   getOfferedCoursesByAdvisorUserId,
+  myCoursesAsTeacher,
 };
