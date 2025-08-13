@@ -1,54 +1,25 @@
-import httpStatus from "http-status";
-import QueryBuilder from "../../builder/QueryBuilder";
-import catchAsync from "../../utils/catch.async";
-import { sendResponse } from "../../utils/send.response";
 import { StudentModel } from "./model/model";
+import { Request, Response } from "express";
 
-export const getAllStudents = catchAsync(async (req, res) => {
-  const query = req.query;
-  const userQuery = new QueryBuilder(
-    StudentModel.find()
-      .populate({
-        path: "userId",
-      })
-      .populate({
-        path: "departmentId",
-      }),
-    query,
-  )
-    .search(["studentId"])
-    .filter()
-    .sort()
-    .paginate()
-    .fields();
+const getAllStudents = async (req: Request, res: Response) => {
+  try {
+    const students = await StudentModel.find()
+      .populate("userId")       // get full user details
+      .populate("departmentId") // get full department details
+      .sort({ createdAt: -1 }); // newest first (optional)
 
-  const meta = await userQuery.countTotal();
-  const students = await userQuery.modelQuery.lean();
+    res.status(200).json({
+      message: "All students fetched successfully",
+      data: students,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error fetching students",
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+};
 
-  const result = students.map((student) => ({
-    ...student,
-    fullName: (student as unknown as { userId: { fullName: string } }).userId
-      .fullName,
-    email: (student as unknown as { userId: { email: string } }).userId.email,
-    phone: (student as unknown as { userId: { phone: string } }).userId.phone,
-    gender: (student as unknown as { userId: { gender: string } }).userId
-      .gender,
-    image: (student as unknown as { userId: { image: string } }).userId.image,
-    userId: (student as unknown as { userId: { _id: string } }).userId._id,
-    department: (student as unknown as { departmentId: { name: string } })
-      .departmentId.name,
-    departmentId: undefined,
-  }));
-
-  return sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Students found successfully",
-    data: {
-      meta,
-      result,
-    },
-  });
-});
-
-export const StudentController = {};
+export const StudentController = {
+  getAllStudents,
+};
