@@ -28,6 +28,11 @@ const createAttendance = async (req: Request, res: Response) => {
     //   message: "Attendance created successfully",
     //   data: savedAttendance,
     // });
+    res.status(201).json({
+      success: true,
+      message: "Attendance created successfully", 
+      data: attendance,
+    });
 
   } catch (error) {
     res.status(500).json({ message: "Error creating attendance", error });
@@ -68,9 +73,9 @@ const getAttendanceByDate = async (req: Request, res: Response) => {
       .populate("courseId")
       .populate("studentList");
 
-    if (attendance.length === 0) {
-      return res.status(404).json({ message: "No attendance found for this date" });
-    }
+    // if (attendance.length === 0) {
+    //   return res.status(404).json({ message: "No attendance found for this date" });
+    // }
 
     res.status(200).json({
       message: "Attendance fetched successfully",
