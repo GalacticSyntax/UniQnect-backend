@@ -7,16 +7,21 @@ import { CourseRegisteredModel } from "./model/model";
 const registerCourseController = async (req: Request, res: Response) => {
   try {
     const parsed = courseRegistrationValidation.parse(req.body);
-    const registration = await CourseRegisteredService.registerCourseService(parsed);
+    const registration =
+      await CourseRegisteredService.registerCourseService(parsed);
     res.status(201).json({ success: true, data: registration });
   } catch (err: any) {
     res.status(400).json({ success: false, message: err.message });
   }
 };
 
-const getCourseRegistrationsController = async (_req: Request, res: Response) => {
+const getCourseRegistrationsController = async (
+  _req: Request,
+  res: Response,
+) => {
   try {
-    const registrations = await CourseRegisteredService.getCourseRegistrationsService();
+    const registrations =
+      await CourseRegisteredService.getCourseRegistrationsService();
     res.status(200).json({ success: true, data: registrations });
   } catch (err: any) {
     res.status(500).json({ success: false, message: err.message });
@@ -25,17 +30,17 @@ const getCourseRegistrationsController = async (_req: Request, res: Response) =>
 
 const myRegisteredCourses = async (req: Request, res: Response) => {
   try {
-    const { userId } = req.params; 
-
+    const { userId } = req.params;
+    
     const student = await StudentModel.findOne({ userId });
-
+    
     if (!student) {
       return res.status(400).json({ message: "studentId is required" });
     }
-
-    const registeredCourses = await CourseRegisteredModel.find({ studentId: student?.studentId })
-      .populate("courseList");
-
+    
+    const registeredCourses = await CourseRegisteredModel.find({
+      studentId: student?._id,
+    }).populate("courseList");
 
     res.status(200).json({
       success: true,
@@ -50,9 +55,6 @@ const myRegisteredCourses = async (req: Request, res: Response) => {
     });
   }
 };
-
-
-
 
 export const CourseRegisteredController = {
   registerCourseController,
