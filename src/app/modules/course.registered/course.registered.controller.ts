@@ -57,4 +57,5 @@ const myRegisteredCourses = async (req: Request, res: Response) => {
 export const CourseRegisteredController = {
   registerCourseController,
   getCourseRegistrationsController,
+  myRegisteredCourses,
 };
