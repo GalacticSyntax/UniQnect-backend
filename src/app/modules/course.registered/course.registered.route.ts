@@ -7,4 +7,6 @@ router.post( "/", CourseRegisteredController.registerCourseController);
 router.get("/", CourseRegisteredController.getCourseRegistrationsController);
 router.get("/myRegisteredCourses/:userId", CourseRegisteredController.myRegisteredCourses);
 
+router.get("/registered-students", CourseRegisteredController.regesteredStudent);
+
 export const CourseRegisteredRoutes = router;
