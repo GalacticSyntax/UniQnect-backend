@@ -120,7 +120,7 @@ const updateAttendanceDate = async (req: Request, res: Response) => {
   }
 };
 
-export const myAttendanceAsStudent = async (req: Request, res: Response) => {
+const myAttendanceAsStudent = async (req: Request, res: Response) => {
   try {
     const { userId, courseId } = req.query;
 
@@ -175,10 +175,7 @@ function ratioToMark(ratio: number): number {
 }
 
 // GET all students' attendance status for a course
-export const AllStudentAttendanceStatus = async (
-  req: Request,
-  res: Response,
-) => {
+const allStudentAttendanceStatus = async (req: Request, res: Response) => {
   try {
     const { courseId } = req.query;
 
@@ -186,9 +183,13 @@ export const AllStudentAttendanceStatus = async (
       return res.status(400).json({ message: "courseId is required" });
     }
 
-    const attendanceRecords = await attendanceModel.find({
-      courseId: new mongoose.Types.ObjectId(courseId as string),
-    });
+    const attendanceRecords = await attendanceModel
+      .find({
+        courseId: new mongoose.Types.ObjectId(courseId as string),
+      })
+      .populate({
+        path: "studentList.studentId",
+      });
 
     if (attendanceRecords.length === 0) {
       return res.status(404).json({ message: "No attendance records found" });
@@ -238,4 +239,5 @@ export const AttendanceController = {
   updateAttendanceDate,
   getAttendanceByDate,
   myAttendanceAsStudent,
+  allStudentAttendanceStatus,
 };
