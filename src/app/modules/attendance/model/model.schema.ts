@@ -2,6 +2,7 @@ import { Schema } from "mongoose";
 import { IAttendance, IAttendanceModel } from "../attendance.interface";
 import { AttendanceConstant } from "../attendance.constant";
 import { CourseConstant } from "../../course/course.constant";
+import { StudentConstant } from "../../student/student.constant";
 
 const attendanceSchema = new Schema<IAttendance, IAttendanceModel>(
   {
@@ -16,14 +17,20 @@ const attendanceSchema = new Schema<IAttendance, IAttendanceModel>(
     runningSession: {
       type: String,
     },
-    attendedStudentsId: {
-      type: [
-        {
+    studentList: [
+      {
+        studentId: {
           type: Schema.Types.ObjectId,
-          ref: AttendanceConstant.ATTENDANCE_COLLECTION_NAME,
+          ref: StudentConstant.STUDENT_COLLECTION_NAME, 
+          required: true,
         },
-      ],
-    },
+        present: {
+          type: Boolean,
+          required: true,
+          default: false,
+        },
+      }
+    ],
   },
   {
     timestamps: true,
