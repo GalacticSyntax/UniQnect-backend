@@ -52,7 +52,7 @@ const getAttendance = async (req: Request, res: Response) => {
     const attendanceList = await attendanceModel
       .find(query)
       .populate("courseId")
-      .populate("attendedStudentsId");
+      .populate("studentList");
 
     res.status(200).json({
       message: "Attendance fetched successfully",
@@ -120,7 +120,7 @@ const updateAttendanceDate = async (req: Request, res: Response) => {
   }
 };
 
-export const MyAttendanceAsStudent = async (req: Request, res: Response) => {
+export const myAttendanceAsStudent = async (req: Request, res: Response) => {
   try {
     const { userId, courseId } = req.query;
 
@@ -140,7 +140,7 @@ export const MyAttendanceAsStudent = async (req: Request, res: Response) => {
 
     // Find attendance records for this student & course
     const attendanceRecords = await attendanceModel.find({
-      courseId: new mongoose.Types.ObjectId(courseId as string),
+      courseId,
       "studentList.studentId": student._id,
     });
 
@@ -237,4 +237,5 @@ export const AttendanceController = {
   getAttendance,
   updateAttendanceDate,
   getAttendanceByDate,
+  myAttendanceAsStudent,
 };

@@ -8,5 +8,6 @@ router.get("/attendance", AttendanceController.getAttendance);
 router.patch("/attendance/:id", AttendanceController.updateAttendanceDate);
 
 router.get("/attendanceBydate", AttendanceController.getAttendanceByDate);
+router.get("/my-attendance", AttendanceController.myAttendanceAsStudent);
 
 export const AttendanceRoutes = router;
