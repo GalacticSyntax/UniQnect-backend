@@ -27,52 +27,24 @@ export const updateTeacher = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllTeachers = catchAsync(
-  async (req: Request, res: Response) => {
-    const query = req.query;
-    const userQuery = new QueryBuilder(
-      TeacherModel.find().populate({
-        path: "userId",
-      }),
-      query,
-    )
-      .search(["teacherId"])
-      .filter()
-      .sort()
-      .paginate()
-      .fields();
+export const getAllTeachers = async (req: Request, res: Response) => {
+  try {
+    const teachers = await TeacherModel.find()
+      .populate("userId")        // get full user details
+      .populate("departmentId")  // get full department details
+      .sort({ createdAt: -1 });  // newest first (optional)
 
-    const meta = await userQuery.countTotal();
-    const teachers = await userQuery.modelQuery.lean();
-
-    console.log(teachers);
-
-    const result = teachers.map((teacher) => ({
-      ...teacher,
-      fullName: (teacher as unknown as { userId: { fullName: string } }).userId
-        ?.fullName,
-      email: (teacher as unknown as { userId: { email: string } }).userId
-        ?.email,
-      phone: (teacher as unknown as { userId: { phone: string } }).userId
-        ?.phone,
-      gender: (teacher as unknown as { userId: { gender: string } }).userId
-        ?.gender,
-      image: (teacher as unknown as { userId: { image: string } }).userId
-        ?.image,
-      userId: (teacher as unknown as { userId: { _id: string } }).userId?._id,
-    }));
-
-    return sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: "Teachers found successfully",
-      data: {
-        meta,
-        result,
-      },
+    res.status(200).json({
+      message: "All teachers fetched successfully",
+      data: teachers,
     });
-  },
-);
+  } catch (error) {
+    res.status(500).json({
+      message: "Error fetching teachers",
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+};
 
 export const getTeachersByQuery = async (req: Request, res: Response) => {
   try {
