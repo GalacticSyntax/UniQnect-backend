@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import mongoose from "mongoose";
 import {attendanceModel} from "./model/model";
 import { sessionModel } from "../session/model/model";
+import { StudentModel } from "../student/model/model";
 
 // type typeSession =  {
 //   running: string;
@@ -116,15 +117,102 @@ const updateAttendanceDate = async (req: Request, res: Response) => {
 };
 
 
+export const MyAttendanceAsStudent = async (req: Request, res: Response) => {
+  try {
+    const { userId, courseId } = req.query;
 
+    if (!userId || !courseId) {
+      return res.status(400).json({ message: "userId and courseId are required" });
+    }
 
+    // Find studentId from StudentModel
+    const student = await StudentModel.findOne({ userId: new mongoose.Types.ObjectId(userId as string) });
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
 
+    // Find attendance records for this student & course
+    const attendanceRecords = await attendanceModel.find({
+      courseId: new mongoose.Types.ObjectId(courseId as string),
+      "studentList.studentId": student._id
+    });
 
+    // Map to desired format
+    const result = attendanceRecords.map(record => {
+      const studentEntry = record.studentList.find(s => s.studentId.equals(student._id));
+      return {
+        date: record.date,
+        present: studentEntry?.present ?? false
+      };
+    });
 
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching attendance", error });
+  }
+};
 
+// Helper function
+function ratioToMark(ratio: number): number {
+  if (ratio >= 95) return 10;
+  if (ratio >= 90) return 9;
+  if (ratio >= 85) return 8;
+  if (ratio >= 80) return 7;
+  if (ratio >= 75) return 6;
+  if (ratio >= 70) return 5;
+  if (ratio >= 65) return 4;
+  if (ratio >= 60) return 3;
+  return 0; 
+}
 
+// GET all students' attendance status for a course
+export const AllStudentAttendanceStatus = async (req: Request, res: Response) => {
+  try {
+    const { courseId } = req.query;
 
+    if (!courseId) {
+      return res.status(400).json({ message: "courseId is required" });
+    }
 
+    const attendanceRecords = await attendanceModel.find({
+      courseId: new mongoose.Types.ObjectId(courseId as string)
+    });
+
+    if (attendanceRecords.length === 0) {
+      return res.status(404).json({ message: "No attendance records found" });
+    }
+
+    const totalDays = attendanceRecords.length;
+    const studentStats: Record<string, { studentId: mongoose.Types.ObjectId, presentCount: number }> = {};
+
+    attendanceRecords.forEach(record => {
+      record.studentList.forEach(entry => {
+        const idStr = entry.studentId.toString();
+        if (!studentStats[idStr]) {
+          studentStats[idStr] = { studentId: entry.studentId, presentCount: 0 };
+        }
+        if (entry.present) {
+          studentStats[idStr].presentCount++;
+        }
+      });
+    });
+
+    const result = Object.values(studentStats).map(stat => {
+      const ratio = (stat.presentCount * 100) / totalDays;
+      return {
+        studentId: stat.studentId,
+        total: totalDays,
+        present: stat.presentCount,
+        ratio,
+        mark: ratioToMark(ratio)
+      };
+    });
+
+    res.status(200).json({ studentList: result });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching all students attendance status", error });
+  }
+};
 
 
 export const AttendanceController = {
