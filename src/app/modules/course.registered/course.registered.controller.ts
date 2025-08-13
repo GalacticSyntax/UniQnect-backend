@@ -3,6 +3,7 @@ import { courseRegistrationValidation } from "./course.registered.validation";
 import { CourseRegisteredService } from "./course.registered.service";
 import { StudentModel } from "../student/model/model";
 import { CourseRegisteredModel } from "./model/model";
+import path from "path";
 
 const registerCourseController = async (req: Request, res: Response) => {
   try {
@@ -107,7 +108,13 @@ const regesteredStudent = async (req: Request, res: Response) => {
     const students = await CourseRegisteredModel.find({ 
       courseList: { $in: courseId },
       runningSession: session,
-     }).populate("studentId");
+     }).populate({
+      path: "studentId",
+      populate: [
+        { path: "userId" },
+        { path: "departmentId" },
+      ]
+     });
 
      res.status(200).json({
       success: true,
