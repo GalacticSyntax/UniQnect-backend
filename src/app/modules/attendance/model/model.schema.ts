@@ -7,8 +7,7 @@ import { StudentConstant } from "../../student/student.constant";
 const attendanceSchema = new Schema<IAttendance, IAttendanceModel>(
   {
     date: {
-      type: Date,
-      default: Date.now(),
+      type: String,
     },
     courseId: {
       type: Schema.Types.ObjectId,

@@ -56,6 +56,31 @@ const getAttendance = async (req: Request, res: Response) => {
   }
 };
 
+const getAttendanceByDate = async (req: Request, res: Response) => {
+  try {
+    const { courseId, date } = req.query;
+
+    if (!date || !courseId) {
+      return res.status(400).json({ message: "Date and course Id is required" });
+    }
+
+    const attendance = await attendanceModel.find({ date, courseId })
+      .populate("courseId")
+      .populate("studentList");
+
+    if (attendance.length === 0) {
+      return res.status(404).json({ message: "No attendance found for this date" });
+    }
+
+    res.status(200).json({
+      message: "Attendance fetched successfully",
+      data: attendance,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching attendance", error });
+  }
+}
+
 // PATCH - Update only the date
 const updateAttendanceDate = async (req: Request, res: Response) => {
   try {
@@ -101,4 +126,5 @@ export const AttendanceController = {
   createAttendance,
   getAttendance,
   updateAttendanceDate,
+  getAttendanceByDate,
 };

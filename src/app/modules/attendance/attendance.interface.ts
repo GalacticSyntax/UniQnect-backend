@@ -7,7 +7,7 @@ type AttendanceMap = {
 };
 
 export interface IAttendance {
-  date: Date;
+  date: string;
   courseId: Types.ObjectId;
   runningSession: string;
   studentList: Array<AttendanceMap>;
