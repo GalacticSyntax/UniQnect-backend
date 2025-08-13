@@ -1,7 +1,7 @@
 // attendance.controller.ts
 import { Request, Response } from "express";
 import mongoose from "mongoose";
-import {attendanceModel} from "./model/model";
+import { attendanceModel } from "./model/model";
 import { sessionModel } from "../session/model/model";
 import { StudentModel } from "../student/model/model";
 
@@ -15,15 +15,15 @@ const createAttendance = async (req: Request, res: Response) => {
   try {
     const runningSession = await sessionModel.findOne({});
     const { courseId, date, studentList } = req.body;
-    
+
     // const attendance = new attendanceModel({...req.body, runningSession: runningSession?.running });
     // const savedAttendance = await attendance.save();
 
     const attendance = await attendanceModel.findOneAndUpdate(
-      {courseId, date},
-      { courseId, date, runningSession: runningSession?.running },
-      { upsert: true, new: true }
-    )
+      { courseId, date },
+      { courseId, date, runningSession: runningSession?.running, studentList },
+      { upsert: true, new: true },
+    );
 
     // res.status(201).json({
     //   message: "Attendance created successfully",
@@ -31,10 +31,9 @@ const createAttendance = async (req: Request, res: Response) => {
     // });
     res.status(201).json({
       success: true,
-      message: "Attendance created successfully", 
+      message: "Attendance created successfully",
       data: attendance,
     });
-
   } catch (error) {
     res.status(500).json({ message: "Error creating attendance", error });
   }
@@ -46,10 +45,12 @@ const getAttendance = async (req: Request, res: Response) => {
     const { courseId, runningSession } = req.query;
 
     const query: any = {};
-    if (courseId) query.courseId = new mongoose.Types.ObjectId(courseId as string);
+    if (courseId)
+      query.courseId = new mongoose.Types.ObjectId(courseId as string);
     if (runningSession) query.runningSession = runningSession;
 
-    const attendanceList = await attendanceModel.find(query)
+    const attendanceList = await attendanceModel
+      .find(query)
       .populate("courseId")
       .populate("attendedStudentsId");
 
@@ -67,10 +68,13 @@ const getAttendanceByDate = async (req: Request, res: Response) => {
     const { courseId, date } = req.query;
 
     if (!date || !courseId) {
-      return res.status(400).json({ message: "Date and course Id is required" });
+      return res
+        .status(400)
+        .json({ message: "Date and course Id is required" });
     }
 
-    const attendance = await attendanceModel.find({ date, courseId })
+    const attendance = await attendanceModel
+      .findOne({ date, courseId })
       .populate("courseId")
       .populate("studentList");
 
@@ -85,7 +89,7 @@ const getAttendanceByDate = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: "Error fetching attendance", error });
   }
-}
+};
 
 // PATCH - Update only the date
 const updateAttendanceDate = async (req: Request, res: Response) => {
@@ -100,7 +104,7 @@ const updateAttendanceDate = async (req: Request, res: Response) => {
     const updatedAttendance = await attendanceModel.findByIdAndUpdate(
       id,
       { date },
-      { new: true }
+      { new: true },
     );
 
     if (!updatedAttendance) {
@@ -116,17 +120,20 @@ const updateAttendanceDate = async (req: Request, res: Response) => {
   }
 };
 
-
 export const MyAttendanceAsStudent = async (req: Request, res: Response) => {
   try {
     const { userId, courseId } = req.query;
 
     if (!userId || !courseId) {
-      return res.status(400).json({ message: "userId and courseId are required" });
+      return res
+        .status(400)
+        .json({ message: "userId and courseId are required" });
     }
 
     // Find studentId from StudentModel
-    const student = await StudentModel.findOne({ userId: new mongoose.Types.ObjectId(userId as string) });
+    const student = await StudentModel.findOne({
+      userId: new mongoose.Types.ObjectId(userId as string),
+    });
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
@@ -134,15 +141,17 @@ export const MyAttendanceAsStudent = async (req: Request, res: Response) => {
     // Find attendance records for this student & course
     const attendanceRecords = await attendanceModel.find({
       courseId: new mongoose.Types.ObjectId(courseId as string),
-      "studentList.studentId": student._id
+      "studentList.studentId": student._id,
     });
 
     // Map to desired format
-    const result = attendanceRecords.map(record => {
-      const studentEntry = record.studentList.find(s => s.studentId.equals(student._id));
+    const result = attendanceRecords.map((record) => {
+      const studentEntry = record.studentList.find((s) =>
+        s.studentId.equals(student._id),
+      );
       return {
         date: record.date,
-        present: studentEntry?.present ?? false
+        present: studentEntry?.present ?? false,
       };
     });
 
@@ -162,11 +171,14 @@ function ratioToMark(ratio: number): number {
   if (ratio >= 70) return 5;
   if (ratio >= 65) return 4;
   if (ratio >= 60) return 3;
-  return 0; 
+  return 0;
 }
 
 // GET all students' attendance status for a course
-export const AllStudentAttendanceStatus = async (req: Request, res: Response) => {
+export const AllStudentAttendanceStatus = async (
+  req: Request,
+  res: Response,
+) => {
   try {
     const { courseId } = req.query;
 
@@ -175,7 +187,7 @@ export const AllStudentAttendanceStatus = async (req: Request, res: Response) =>
     }
 
     const attendanceRecords = await attendanceModel.find({
-      courseId: new mongoose.Types.ObjectId(courseId as string)
+      courseId: new mongoose.Types.ObjectId(courseId as string),
     });
 
     if (attendanceRecords.length === 0) {
@@ -183,10 +195,13 @@ export const AllStudentAttendanceStatus = async (req: Request, res: Response) =>
     }
 
     const totalDays = attendanceRecords.length;
-    const studentStats: Record<string, { studentId: mongoose.Types.ObjectId, presentCount: number }> = {};
+    const studentStats: Record<
+      string,
+      { studentId: mongoose.Types.ObjectId; presentCount: number }
+    > = {};
 
-    attendanceRecords.forEach(record => {
-      record.studentList.forEach(entry => {
+    attendanceRecords.forEach((record) => {
+      record.studentList.forEach((entry) => {
         const idStr = entry.studentId.toString();
         if (!studentStats[idStr]) {
           studentStats[idStr] = { studentId: entry.studentId, presentCount: 0 };
@@ -197,23 +212,25 @@ export const AllStudentAttendanceStatus = async (req: Request, res: Response) =>
       });
     });
 
-    const result = Object.values(studentStats).map(stat => {
+    const result = Object.values(studentStats).map((stat) => {
       const ratio = (stat.presentCount * 100) / totalDays;
       return {
         studentId: stat.studentId,
         total: totalDays,
         present: stat.presentCount,
         ratio,
-        mark: ratioToMark(ratio)
+        mark: ratioToMark(ratio),
       };
     });
 
     res.status(200).json({ studentList: result });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching all students attendance status", error });
+    res.status(500).json({
+      message: "Error fetching all students attendance status",
+      error,
+    });
   }
 };
-
 
 export const AttendanceController = {
   createAttendance,
