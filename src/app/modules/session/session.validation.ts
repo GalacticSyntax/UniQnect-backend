@@ -15,6 +15,10 @@ const createCurriculumValidationSchema = zod.object({
   // ),
 });
 
+// runningSession: z
+//     .string()
+//     .regex(/^(spring|summer|fall)-\d{4}$/i, "Session must be like fall-2025"),
+
 export const CurriculumValidation = {
   createCurriculumValidationSchema,
 };

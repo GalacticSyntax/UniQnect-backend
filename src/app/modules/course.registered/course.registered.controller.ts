@@ -1,1 +1,30 @@
-export const CourseRegisteredController = {};
+import { Request, Response } from "express";
+import { courseRegistrationValidation } from "./course.registered.validation";
+import { CourseRegisteredService } from "./course.registered.service";
+
+const registerCourseController = async (req: Request, res: Response) => {
+  try {
+    const parsed = courseRegistrationValidation.parse(req.body);
+    const registration = await CourseRegisteredService.registerCourseService(parsed);
+    res.status(201).json({ success: true, data: registration });
+  } catch (err: any) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
+
+const getCourseRegistrationsController = async (_req: Request, res: Response) => {
+  try {
+    const registrations = await CourseRegisteredService.getCourseRegistrationsService();
+    res.status(200).json({ success: true, data: registrations });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+
+
+
+export const CourseRegisteredController = {
+  registerCourseController,
+  getCourseRegistrationsController,
+};

@@ -1,20 +1,25 @@
-import { z as zod } from "zod";
+import { z } from "zod";
 
-const createCourseRegisteredValidationSchema = zod.object({
-  text: zod.string({
-    required_error: "text is required",
-    invalid_type_error: "text must be string",
-  }),
-  // .max(
-  //   DummyConstant.DUMMY_TEXT_MAX_LENGTH,
-  //   `dummy text max length is ${DummyConstant.DUMMY_TEXT_MAX_LENGTH}`,
-  // )
-  // .min(
-  //   DummyConstant.DUMMY_TEXT_MIN_LENGTH,
-  //   `dummy text max length is ${DummyConstant.DUMMY_TEXT_MIN_LENGTH}`,
-  // ),
+// export const registeredCourseValidationSchema = z.object({
+//   studentId: z.string().trim().min(1, "Student ID is required"),
+//   courseList: z
+//     .array(z.string().trim().min(1, "Course ID is required"))
+//     .nonempty("At least one course is required"),
+// });
+
+export const courseRegistrationValidation = z.object({
+  studentId: z.string().min(1, "Student ID is required"),
+  courseId: z
+    .array(z.string().min(1, "Course ID is required"))
+    .min(1, "At least one Course ID is required"),
 });
 
-export const CourseRegisteredValidation = {
-  createCourseRegisteredValidationSchema,
+export type CourseRegistrationBody = {
+  studentId: string;
+  courseId: Array<string>;
+};
+
+
+export const RegisteredCourseValidation = {
+  // registeredCourseValidationSchema,
 };
