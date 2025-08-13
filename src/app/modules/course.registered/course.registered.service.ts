@@ -1,6 +1,7 @@
 import { CourseRegistrationBody } from "./course.registered.validation";
 import {sessionModel} from "../session/model/model";
 import {CourseRegisteredModel} from "./model/model";
+import { StudentModel } from "../student/model/model";
 
 const registerCourseService = async (data: CourseRegistrationBody) => {
   // Get the running session
@@ -9,9 +10,17 @@ const registerCourseService = async (data: CourseRegistrationBody) => {
     throw new Error("No running session found");
   }
 
+  const student = await StudentModel.findOne({ studentId: data.studentId })
+  if (!student) {
+    throw new Error("Student not found");
+  }
+
+  // const courseIds
+
   // Create course registration
   const registration = await CourseRegisteredModel.create({
-    ...data,
+    studentId: student._id,
+    courseId: data.courseId,
     sessionId: runningSession._id,
   });
 
