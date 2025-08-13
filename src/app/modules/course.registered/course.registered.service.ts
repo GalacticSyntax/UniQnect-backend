@@ -28,7 +28,7 @@ const registerCourseService = async (data: CourseRegistrationBody) => {
       new Set([
         ...registration.courseList.map((id) => id.toString()),
         ...data.courseId.map((id) => id.toString()),
-      ])
+      ]),
     ).map((id) => new mongoose.Types.ObjectId(id)); // convert back to ObjectId
 
     registration.courseList = updatedCourses;
@@ -38,7 +38,7 @@ const registerCourseService = async (data: CourseRegistrationBody) => {
     registration = await CourseRegisteredModel.create({
       studentId: student._id,
       courseList: [...new Set(data.courseId.map((id) => id.toString()))].map(
-        (id) => new mongoose.Types.ObjectId(id)
+        (id) => new mongoose.Types.ObjectId(id),
       ),
       runningSession: runningSession.running,
     });
@@ -48,9 +48,20 @@ const registerCourseService = async (data: CourseRegistrationBody) => {
 };
 
 const getCourseRegistrationsService = async () => {
-  return await CourseRegisteredModel.find().populate(
-    "studentId courseId sessionId",
-  );
+  return await CourseRegisteredModel.find()
+    .populate({
+      path: "studentId",
+      populate: [
+        { path: "departmentId" }, // department
+        { path: "userId" }, // user details
+      ],
+    })
+    .populate({
+      path: "courseList",
+      populate: {
+        path: "prerequisiteCourse",
+      },
+    });
 };
 
 export const CourseRegisteredService = {
