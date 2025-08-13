@@ -195,25 +195,13 @@ export const updateUser = async (req: Request, res: Response) => {
 };
 
 export const getAllUsers = catchAsync(async (req: Request, res: Response) => {
-  const query = req.query;
-  const userQuery = new QueryBuilder(UserModel.find(), query)
-    .search(["email"])
-    .filter()
-    .sort()
-    .paginate()
-    .fields();
-
-  const meta = await userQuery.countTotal();
-  const result = await userQuery.modelQuery;
+  const result = await UserModel.find({});
 
   return sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "User found successfully",
-    data: {
-      meta,
-      result,
-    },
+    data: result,
   });
 });
 
