@@ -38,11 +38,13 @@ const myRegisteredCourses = async (req: Request, res: Response) => {
 
 
     res.status(200).json({
+      success: true,
       message: "Registered courses fetched successfully",
       data: registeredCourses,
     });
   } catch (error) {
     res.status(500).json({
+      success: false,
       message: "Error fetching registered courses",
       error: error instanceof Error ? error.message : error,
     });
