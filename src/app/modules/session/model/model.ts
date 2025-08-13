@@ -14,7 +14,7 @@ import "./model.middleware";
 import "./model.static.method";
 /* session schema static methods end ================== */
 
-export const CurriculumModel = model<ISession, ISessionModel>(
+export const sessionModel = model<ISession, ISessionModel>(
   SessionConstant.SESSION_COLLECTION_NAME,
   sessionSchema,
 );
