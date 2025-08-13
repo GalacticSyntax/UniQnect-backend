@@ -107,7 +107,7 @@ const regesteredStudent = async (req: Request, res: Response) => {
     const students = await CourseRegisteredModel.find({ 
       courseList: { $in: courseId },
       runningSession: session,
-     });
+     }).populate("studentId");
 
      res.status(200).json({
       success: true,
