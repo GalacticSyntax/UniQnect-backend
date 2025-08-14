@@ -5,9 +5,11 @@ export interface IResult {
   studentId: Types.ObjectId;
   courseId: Types.ObjectId;
   isVarified: boolean;
-  markes: number;
-  resultType: "mid" | "final" | "extra";
-  runningSession: "" | "";
+  mid: number;
+  final: number;
+  extra: number;
+  attendance: number;
+  runningSession: string;
 }
 
 export interface IResultModel extends Model<IResult> {

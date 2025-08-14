@@ -15,18 +15,24 @@ const resultIResultSchema = new Schema<IResult, IResultModel>(
       ref: StudentConstant.STUDENT_COLLECTION_NAME,
       required: true,
     },
-    markes: {
+    mid: {
       type: Number,
-      required: true,
+      default: 0,
     },
-    resultType: {
-      type: String,
-      enum: ["mid", "final", "extra"],
-      required: true,
+    final: {
+      type: Number,
+      default: 0,
+    },
+    extra: {
+      type: Number,
+      default: 0,
+    },
+    attendance: {
+      type: Number,
+      default: 0,
     },
     runningSession: {
       type: String,
-      enum: [""],
       required: true,
     },
   },
